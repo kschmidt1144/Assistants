@@ -1,0 +1,19 @@
+{
+  "name": "assistants",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Focused AI assistants (Coding, Meeting, Jobs) built on one shared core. See REBUILD_PLAN.md.",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "workspaces": [
+    "packages/core-web",
+    "apps/*/frontend"
+  ],
+  "scripts": {
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "build": "npm run build --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present"
+  }
+}
