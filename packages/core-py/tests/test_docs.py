@@ -1,7 +1,6 @@
 import io
 
 import pytest
-
 from assistants_core.docs import parse_document
 
 

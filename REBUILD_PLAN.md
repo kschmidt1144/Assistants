@@ -317,7 +317,7 @@ Consolidated punch-list of issues found across the prototypes — bake the fixes
 
 > Checkboxes are for you to track. Phases are sequential for the shared core; apps can overlap once Core (Phase 1) lands.
 
-> **Progress (2026-06-07):** Phases 0–4 built & verified — **all three apps stand up.**
+> **Progress (2026-06-07):** Phases 0–5 done — **all three apps stand up; hardened** (ruff clean, 27 tests, typechecks, `scripts/test.sh`).
 > • **Phase 0/1 (core):** npm-workspaces monorepo (Node 24 / Python 3.13); `core-py` (config, model registry, Claude + Gemini-Live clients, `RealtimeSession`, **speaker-ID embeddings**, doc parsing, SQLite) **20 tests green**; `core-web` (AudioWorklet capture, video capture, RealtimeClient, **SpeechTranscription**, DraggableWindow, MarkdownRenderer) **typechecks clean**.
 > • **Phase 2 (Coding Copilot):** backend `/ws/live` (Gemini Live) + `/api/analyze` (Claude vision) + `/api/ocr`; React/Vite frontend (feed, live + analyze, OCR, region-select, annotations, templates, pinned context, overlay) **builds clean**.
 > • **Phase 3 (Meeting Copilot, local-only):** backend local speaker-ID (#7) + summary/action-items/clean/ask (Claude) + meeting SQLite CRUD; React/Vite frontend (Web-Speech transcription, speaker-ID loop, voice enrollment, notes, save/load/export, topic/timer) **builds clean**.
@@ -350,7 +350,11 @@ Consolidated punch-list of issues found across the prototypes — bake the fixes
 - [x] Application Q&A + cover letters. *(URL auto-fetch intentionally omitted — paste JD. **Deferred:** deterministic data-bank engine + bank editor — see §3.8/§4.3 note.)*
 
 ### Phase 5 — Hardening
-- [ ] Tests, security pass, docs, packaging (local launch scripts / installers).
+- [x] **Lint** (ruff, `ruff.toml`) clean across core + app backends; `StrEnum` + `contextlib.suppress` cleanups.
+- [x] **Tests**: app-backend suites (jobs store + resume retry-loop, meeting persistence + speaker-ID, coding routes) on top of core's 20 — **27 total**; robust `.env` discovery (walk-up from CWD).
+- [x] **Scripts**: `scripts/{setup,test,dev,build}.sh` (one-command setup / all-checks / launch an app / build).
+- [x] **Security pass + docs**: `SECURITY.md` (local-first threat model, consent, secrets), README dev section; upload returns 400 on bad file type; backends bind `127.0.0.1`.
+- [ ] *(Optional)* TS eslint; per-app installers/packaging; CI workflow.
 
 ---
 

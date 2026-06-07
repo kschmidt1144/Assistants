@@ -172,7 +172,10 @@ async def set_profile(req: SetProfile) -> dict[str, bool]:
 @app.post("/api/profile/upload")
 async def upload_profile(file: UploadFile = File(...)) -> dict[str, object]:
     data = await file.read()
-    text = parse_document(data, file.filename or "resume.txt")
+    try:
+        text = parse_document(data, file.filename or "resume.txt")
+    except ValueError as e:
+        raise HTTPException(400, str(e)) from e
     await store().set_profile(text)
     return {"ok": True, "chars": len(text)}
 

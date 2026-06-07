@@ -28,6 +28,7 @@ dependencies = [
 dev = [
   "pytest>=8.0",
   "pytest-asyncio>=0.23",
+  "ruff>=0.6",
 ]
 # Higher-quality local speaker embeddings (pulls torch + librosa). Optional — a pure-numpy
 # SpectralEmbedder fallback works without it. Install: pip install -e "packages/core-py[speaker]"

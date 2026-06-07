@@ -7,6 +7,7 @@ directly. See `.env.example` at the repo root for the variable names.
 from __future__ import annotations
 
 from functools import lru_cache
+from pathlib import Path
 
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -42,7 +43,16 @@ class Settings(BaseSettings):
         return bool(self.google_api_key)
 
 
+def _find_dotenv() -> str | None:
+    """Walk up from CWD to find a `.env`, so an app works regardless of where it's launched."""
+    for directory in [Path.cwd(), *Path.cwd().parents]:
+        candidate = directory / ".env"
+        if candidate.is_file():
+            return str(candidate)
+    return None
+
+
 @lru_cache
 def get_settings() -> Settings:
     """Cached process-wide settings. Call `get_settings.cache_clear()` in tests."""
-    return Settings()
+    return Settings(_env_file=_find_dotenv())

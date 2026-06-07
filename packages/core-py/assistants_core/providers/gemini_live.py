@@ -12,6 +12,7 @@ a real GOOGLE_API_KEY and a confirmed Gemini Live model id (open decision #8).
 from __future__ import annotations
 
 import asyncio
+import contextlib
 from collections.abc import Awaitable, Callable
 from typing import Any
 
@@ -138,15 +139,11 @@ class GeminiLiveBridge:
     async def close(self) -> None:
         if self._recv_task is not None:
             self._recv_task.cancel()
-            try:
+            with contextlib.suppress(asyncio.CancelledError, Exception):
                 await self._recv_task
-            except (asyncio.CancelledError, Exception):  # noqa: BLE001
-                pass
         if self._cm is not None:
-            try:
+            with contextlib.suppress(Exception):
                 await self._cm.__aexit__(None, None, None)
-            except Exception:  # noqa: BLE001
-                pass
         self._session = None
         self._cm = None
         self._recv_task = None

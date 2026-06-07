@@ -8,17 +8,17 @@ placeholder pending open decision #8 and is overridable via `GEMINI_LIVE_MODEL`.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from enum import Enum
+from enum import StrEnum
 
 from .config import Settings
 
 
-class Provider(str, Enum):
+class Provider(StrEnum):
     GEMINI = "gemini"
     ANTHROPIC = "anthropic"
 
 
-class ModelRole(str, Enum):
+class ModelRole(StrEnum):
     REALTIME = "realtime"  # bidirectional audio/video streaming + live transcription
     REASON_DEEP = "reason_deep"  # hardest reasoning: analysis, summaries, resume tailoring
     REASON_BALANCED = "reason_balanced"  # everyday reasoning at lower cost

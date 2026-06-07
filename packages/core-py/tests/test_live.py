@@ -6,7 +6,6 @@ Run explicitly with keys set:  pytest -m live
 import os
 
 import pytest
-
 from assistants_core.config import Settings
 from assistants_core.models import ModelRole
 from assistants_core.providers import ProviderRouter, user_text

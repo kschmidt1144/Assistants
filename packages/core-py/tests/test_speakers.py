@@ -1,5 +1,4 @@
 import numpy as np
-
 from assistants_core.persistence import Database
 from assistants_core.transcription import SpeakerIdentifier, cosine, pcm16_to_float32
 
