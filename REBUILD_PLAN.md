@@ -54,7 +54,7 @@ They share **~70% of their plumbing** (browser PCM16 capture → WebSocket → G
 | 5 | Provider posture | ✅ **Gemini Live + Claude only** | no Deepgram/AssemblyAI/OpenAI; narrows #7 to local embeddings |
 | 6 | Meeting hosting | ✅ **Local-only** | no Firebase auth, no Cloud Run/Terraform; local FastAPI + SQLite; no auth layer needed (single local user) |
 | 7 | Diarization | ✅ **Local voice-embeddings** | resemblyzer (optional `[speaker]` extra) + pure-numpy fallback; built in Phase 3 |
-| 8 | Gemini Live model | ✅ **Native-audio (Option B)** | default `gemini-2.5-flash-native-audio-preview-12-2025`; AUDIO out + transcription; voice-out wired. Override via `GEMINI_LIVE_MODEL`; verify your key serves it (`client.models.list()`). |
+| 8 | Gemini Live model | ✅ **Native-audio (Option B)** | default `gemini-2.5-flash-native-audio-latest` (floating alias — tracks newest native-audio model, avoids dated previews getting retired; was `-preview-12-2025`). AUDIO out + transcription; voice-out wired. Override via `GEMINI_LIVE_MODEL`; verify your key serves it (`client.models.list()`). |
 
 **All decisions locked.** (Confirm the Gemini Live id is served by your key before the first live run; everything else is settled.)
 
@@ -228,7 +228,7 @@ The prototypes used a **mix of real and aspirational/stale Gemini IDs** (e.g. `g
 
 | Job | Model | Why |
 |---|---|---|
-| **Realtime** audio/video streaming + live commentary + live transcription | **Gemini Live native-audio** — `gemini-2.5-flash-native-audio-preview-12-2025` (#8) | Bidirectional realtime audio+video; replies as audio + transcription (voice-out wired). Override via `GEMINI_LIVE_MODEL`. |
+| **Realtime** audio/video streaming + live commentary + live transcription | **Gemini Live native-audio** — `gemini-2.5-flash-native-audio-latest` (#8) | Bidirectional realtime audio+video; replies as audio + transcription (voice-out wired). Override via `GEMINI_LIVE_MODEL`. |
 | **Deep reasoning**: code analysis, meeting summaries, resume tailoring, cross-job synthesis | **Claude Opus 4.8** — `claude-opus-4-8` | Most capable; 1M context; adaptive thinking; structured outputs; strong code review & long-horizon work. |
 | **Balanced / high-volume** reasoning | **Claude Sonnet 4.6** — `claude-sonnet-4-6` | Best speed/intelligence balance; 1M context; ~⅗ the cost of Opus. |
 | **Fast utility**: keyword extraction, ATS scoring, classification, transcript cleaning | **Claude Haiku 4.5** — `claude-haiku-4-5` | Fastest/cheapest; 200K context. |
@@ -321,7 +321,7 @@ Consolidated punch-list of issues found across the prototypes — bake the fixes
 > • **Phase 0/1 (core):** npm-workspaces monorepo (Node 24 / Python 3.13); `core-py` (config, model registry, Claude + Gemini-Live clients, `RealtimeSession`, **speaker-ID embeddings**, doc parsing, SQLite) **20 tests green**; `core-web` (AudioWorklet capture, video capture, RealtimeClient, **SpeechTranscription**, DraggableWindow, MarkdownRenderer) **typechecks clean**.
 > • **Phase 2 (Coding Copilot):** backend `/ws/live` (Gemini Live) + `/api/analyze` (Claude vision) + `/api/ocr`; React/Vite frontend (feed, live + analyze, OCR, region-select, annotations, templates, pinned context, overlay) **builds clean**.
 > • **Phase 3 (Meeting Copilot, local-only):** backend local speaker-ID (#7) + summary/action-items/clean/ask (Claude) + meeting SQLite CRUD; React/Vite frontend (Web-Speech transcription, speaker-ID loop, voice enrollment, notes, save/load/export, topic/timer) **builds clean**.
-> • **#8 resolved (Option B, native-audio):** realtime defaults to `gemini-2.5-flash-native-audio-preview-12-2025`; the Live bridge requests AUDIO + transcription, and **voice-out is wired** (core-web `AudioPlayback`, Coding 🔊 toggle). All 8 decisions locked.
+> • **#8 resolved (Option B, native-audio):** realtime defaults to `gemini-2.5-flash-native-audio-latest`; the Live bridge requests AUDIO + transcription, and **voice-out is wired** (core-web `AudioPlayback`, Coding 🔊 toggle). All 8 decisions locked.
 > • **Phase 4 (Job Application Assistant):** backend (JD parse, tracker SQLite w/ dedup+status-history, profile paste/upload, LLM tailor→ATS→retry, cover letter, Q&A, unified resume); React/Vite frontend (Profile / Add Job / Tracker + AI actions) **builds clean**. Data-bank engine deferred (Phase 4.5).
 > • Not yet runtime-tested live (needs API keys; confirm the Gemini id is served by your key). Tooling: npm workspaces (no pnpm; global npm cache broken → `--cache ./.npmcache`); Python 3.13 venv (no uv); speaker-ID quality backend `pip install -e "packages/core-py[speaker]"` (else numpy fallback).
 
@@ -370,7 +370,7 @@ Consolidated punch-list of issues found across the prototypes — bake the fixes
 
 ## 11. Open decisions
 
-✅ **All locked (see §1.2):** #1 shape · #2 build order · #3 React 19 + TS · #4 no desktop shell · #5 Gemini Live + Claude only · #6 Meeting local-only · #7 diarization = **local voice-embeddings** · #8 Gemini Live = **native-audio (Option B)**, default `gemini-2.5-flash-native-audio-preview-12-2025`.
+✅ **All locked (see §1.2):** #1 shape · #2 build order · #3 React 19 + TS · #4 no desktop shell · #5 Gemini Live + Claude only · #6 Meeting local-only · #7 diarization = **local voice-embeddings** · #8 Gemini Live = **native-audio (Option B)**, default `gemini-2.5-flash-native-audio-latest`.
 
 **No open decisions.** One build-time verification remains: confirm your Gemini API key serves the chosen native-audio model (`client.models.list()`), or set `GEMINI_LIVE_MODEL` to one it does (e.g. `gemini-3.1-flash-live-preview`).
 

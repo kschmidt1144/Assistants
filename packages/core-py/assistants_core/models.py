@@ -1,8 +1,8 @@
 """The single source of truth for which model plays which role.
 
 Design (REBUILD_PLAN.md §5): realtime audio/video → Gemini Live (Claude has no realtime API);
-deep reasoning → Claude. Claude model ids are pinned and verified; the Gemini Live id is a
-placeholder pending open decision #8 and is overridable via `GEMINI_LIVE_MODEL`.
+deep reasoning → Claude. Claude model ids are pinned and verified; the Gemini Live default is a
+floating native-audio alias (decision #8, verified served) and is overridable via `GEMINI_LIVE_MODEL`.
 """
 
 from __future__ import annotations
@@ -42,9 +42,12 @@ CLAUDE_BALANCED = "claude-sonnet-4-6"
 CLAUDE_FAST = "claude-haiku-4-5"
 
 # Decision #8: native-audio Gemini Live model (Option B). Replies with audio + transcription;
-# the bridge requests AUDIO modality + transcription accordingly. Override via GEMINI_LIVE_MODEL
-# (e.g. gemini-3.1-flash-live-preview). Verify it's served by your key: client.models.list().
-DEFAULT_GEMINI_LIVE_MODEL = "gemini-2.5-flash-native-audio-preview-12-2025"
+# the bridge requests AUDIO modality + transcription accordingly. We default to the floating
+# `-latest` alias so we track the newest native-audio model instead of pinning a dated preview
+# that eventually gets retired — pin a dated id here if you need reproducibility. Override via
+# GEMINI_LIVE_MODEL (e.g. gemini-3.1-flash-live-preview — note that's *live*, not native-audio).
+# Verify it's served by your key: client.models.list().
+DEFAULT_GEMINI_LIVE_MODEL = "gemini-2.5-flash-native-audio-latest"
 
 
 def build_registry(settings: Settings) -> dict[ModelRole, ModelSpec]:
