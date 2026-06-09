@@ -1,8 +1,11 @@
 import base64
+from unittest.mock import AsyncMock
 
 import main
 import numpy as np
+import pytest
 from assistants_core import Database, SpeakerIdentifier
+from fastapi.testclient import TestClient
 
 
 class StubEmbedder:
@@ -19,27 +22,151 @@ def _clip(int16_val: int, n: int = 1600) -> str:
     return base64.b64encode(np.full(n, int16_val, dtype="<i2").tobytes()).decode()
 
 
-async def test_persistence_and_speaker_id():
-    db = await Database(":memory:").connect()
-    main._state["db"] = db
-    main._state["identifier"] = SpeakerIdentifier(db, embedder=StubEmbedder())
-    try:
-        m = await main.create_meeting(main.CreateMeeting(title="Standup"))
-        await main.append_entries(
-            m["id"], main.AppendEntries(entries=[main.EntryIn(text="hi", speaker="alice")])
-        )
-        got = await main.get_meeting(m["id"])
-        assert [e["text"] for e in got["entries"]] == ["hi"]
+@pytest.fixture
+def client(monkeypatch, tmp_path):
+    # Ensure no API keys interfere with logic
+    import assistants_core.config
 
-        await main.enroll_speaker(main.EnrollRequest(name="alice", samples=[_clip(3277), _clip(3277)]))
-        await main.enroll_speaker(main.EnrollRequest(name="bob", samples=[_clip(16384)]))
+    monkeypatch.setattr(assistants_core.config, "_find_dotenv", lambda: None)
 
-        assert (await main.identify_speaker(main.IdentifyRequest(audio=_clip(3277))))["speaker"] == "alice"
-        assert (await main.identify_speaker(main.IdentifyRequest(audio=_clip(31000))))["speaker"] == "Unknown"
+    main.get_settings.cache_clear()
+    import os
 
-        profiles = await main.voice_profiles()
-        assert {p["name"] for p in profiles} == {"alice", "bob"}
-    finally:
-        await db.close()
-        main._state["db"] = None
-        main._state["identifier"] = None
+    if "ANTHROPIC_API_KEY" in os.environ:
+        monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
+
+    db_path = str(tmp_path / "test.db")
+
+    fake_settings = main.get_settings()
+    fake_settings.db_path = db_path
+    monkeypatch.setattr(main, "get_settings", lambda: fake_settings)
+
+    from contextlib import asynccontextmanager
+
+    @asynccontextmanager
+    async def fake_lifespan(app):
+        db = await Database(db_path).connect()
+        main._state["db"] = db
+        main._state["identifier"] = SpeakerIdentifier(db, embedder=StubEmbedder())
+        try:
+            yield
+        finally:
+            await db.close()
+
+    main.app.router.lifespan_context = fake_lifespan
+
+    with TestClient(main.app) as c:
+        yield c
+
+
+@pytest.fixture
+def mock_claude(monkeypatch):
+    mock_reason = AsyncMock(return_value="mocked answer")
+    monkeypatch.setattr(main.router.claude, "reason", mock_reason)
+
+    mock_reason_structured = AsyncMock(return_value={"items": [{"action": "a", "owner": "o"}]})
+    monkeypatch.setattr(main.router.claude, "reason_structured", mock_reason_structured)
+
+    return mock_reason, mock_reason_structured
+
+
+def test_speaker_id_endpoints(client):
+    # MTG-I-01
+    res = client.post("/api/enroll-speaker", json={"name": "alice", "samples": [_clip(3277)]})
+    assert res.status_code == 200
+    assert res.json()["name"] == "alice"
+    assert res.json()["num_samples"] == 1
+
+    res = client.post("/api/identify-speaker", json={"audio": _clip(3277)})
+    assert res.status_code == 200
+    assert res.json()["speaker"] == "alice"
+
+    res = client.post("/api/identify-speaker", json={"audio": _clip(31000)})
+    assert res.status_code == 200
+    assert res.json()["speaker"] == "Unknown"
+
+    res = client.get("/api/voice-profiles")
+    assert res.status_code == 200
+    assert "alice" in [p["name"] for p in res.json()]
+    assert "embedding" not in res.json()[0]
+
+    res = client.delete("/api/voice-profiles/alice")
+    assert res.status_code == 200
+
+    res = client.get("/api/voice-profiles")
+    assert "alice" not in [p["name"] for p in res.json()]
+
+
+def test_claude_endpoints(client, mock_claude, monkeypatch):
+    # MTG-I-02 & MTG-I-03
+    mock_reason, mock_reason_structured = mock_claude
+
+    # Missing key - MTG-I-03
+    for ep in ["summarize", "action-items", "clean-transcript"]:
+        res = client.post(f"/api/{ep}", json={"transcript": "text"})
+        assert res.status_code == 400
+
+    res = client.post("/api/ask", json={"transcript": "text", "question": "q"})
+    assert res.status_code == 400
+
+    # Mock key
+    fake_settings = main.get_settings()
+    fake_settings.anthropic_api_key = "test"
+    monkeypatch.setattr(main, "get_settings", lambda: fake_settings)
+
+    res = client.post("/api/summarize", json={"transcript": "text"})
+    assert res.status_code == 200
+    assert res.json() == {"summary": "mocked answer"}
+
+    res = client.post("/api/action-items", json={"transcript": "text"})
+    assert res.status_code == 200
+    assert res.json() == {"items": [{"action": "a", "owner": "o"}]}
+
+    res = client.post("/api/clean-transcript", json={"transcript": "text"})
+    assert res.status_code == 200
+    assert res.json() == {"cleaned": "mocked answer"}
+
+    res = client.post("/api/ask", json={"transcript": "text", "question": "q"})
+    assert res.status_code == 200
+    assert res.json() == {"answer": "mocked answer"}
+
+
+def test_meeting_crud(client):
+    # MTG-I-04, MTG-I-05, MTG-I-06
+    res = client.post("/api/meetings", json={"title": "Standup"})
+    assert res.status_code == 200
+    m_id = res.json()["id"]
+
+    res = client.post(
+        f"/api/meetings/{m_id}/entries", json={"entries": [{"text": "hi", "speaker": "alice"}]}
+    )
+    assert res.status_code == 200
+    assert res.json() == {"added": 1}
+
+    res = client.get(f"/api/meetings/{m_id}")
+    assert res.status_code == 200
+    assert res.json()["session"]["title"] == "Standup"
+    assert len(res.json()["entries"]) == 1
+    assert res.json()["entries"][0]["text"] == "hi"
+
+    res = client.get("/api/meetings")
+    assert res.status_code == 200
+    assert len(res.json()) >= 1
+
+    res = client.get("/api/meetings/missing")
+    assert res.status_code == 404
+
+    # PUT overwrite (K6 issue)
+    res = client.put(f"/api/meetings/{m_id}", json={"title": "New", "summary": "A summary"})
+    assert res.status_code == 200
+
+    res = client.get(f"/api/meetings/{m_id}")
+    assert res.json()["session"]["title"] == "New"
+    assert res.json()["session"]["metadata"]["summary"] == "A summary"
+
+    res = client.post("/api/meetings", data="malformed")
+    assert res.status_code == 422
+
+    # Assert no DELETE (K6 scope decision)
+    res = client.delete(f"/api/meetings/{m_id}")
+    assert res.status_code == 405

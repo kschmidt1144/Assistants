@@ -147,8 +147,13 @@ class Database:
             "INSERT INTO transcript_entries (transcript_id, ts, speaker, text) VALUES (?, ?, ?, ?)",
             (transcript_id, ts if ts is not None else _now(), speaker, text),
         )
+        now = _now()
         await self._conn.execute(
-            "UPDATE transcripts SET updated_at = ? WHERE id = ?", (_now(), transcript_id)
+            "UPDATE transcripts SET updated_at = ? WHERE id = ?", (now, transcript_id)
+        )
+        await self._conn.execute(
+            "UPDATE sessions SET updated_at = ? WHERE id = (SELECT session_id FROM transcripts WHERE id = ?)",
+            (now, transcript_id),
         )
         await self._conn.commit()
         return int(cur.lastrowid)
