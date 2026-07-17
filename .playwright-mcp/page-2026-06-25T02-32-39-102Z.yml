@@ -1,0 +1,24 @@
+- generic [ref=e2]:
+  - generic [ref=e39]: Camera · 1920×1080
+  - generic [ref=e9]:
+    - button "Move toolbar" [ref=e10]
+    - generic [ref=e11]:
+      - button "📷 Camera" [ref=e12] [cursor=pointer]
+      - button "🖥️ Screen" [ref=e13] [cursor=pointer]
+      - button "⏹ Stop" [ref=e40] [cursor=pointer]
+    - generic [ref=e15]:
+      - button "⚡ Live" [ref=e16] [cursor=pointer]
+      - button "Toggle microphone" [ref=e17] [cursor=pointer]: 🎙️
+      - button "🔊" [ref=e26] [cursor=pointer]
+      - generic [ref=e41]: disconnected
+    - generic [ref=e28]:
+      - button "🔬 Analyze" [ref=e29] [cursor=pointer]
+      - button "⬚ Region" [ref=e30] [cursor=pointer]
+      - button "🔤 OCR" [ref=e31] [cursor=pointer]
+      - button "✏️ Draw" [ref=e32] [cursor=pointer]
+      - button "Clear" [ref=e33] [cursor=pointer]
+    - generic [ref=e35]:
+      - button "Quick actions" [ref=e36] [cursor=pointer]:
+        - text: ⚡ Actions
+        - generic [ref=e37]: ⌘K
+      - button "Settings" [ref=e38] [cursor=pointer]: ⚙

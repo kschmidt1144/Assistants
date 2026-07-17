@@ -166,6 +166,11 @@ class Database:
         )
         return [dict(r) for r in await cur.fetchall()]
 
+    async def delete_session(self, session_id: str) -> None:
+        # Transcripts + entries cascade via FK (PRAGMA foreign_keys = ON, set in connect()).
+        await self._conn.execute("DELETE FROM sessions WHERE id = ?", (session_id,))
+        await self._conn.commit()
+
     async def update_session(
         self, session_id: str, *, title: str | None = None, metadata: dict[str, Any] | None = None
     ) -> None:

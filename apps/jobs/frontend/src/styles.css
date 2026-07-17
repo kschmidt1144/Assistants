@@ -1,57 +1,244 @@
-:root {
-  --bg: #0b0d12;
-  --panel: rgba(20, 22, 30, 0.72);
-  --border: rgba(255, 255, 255, 0.12);
-  --text: #e8eaf0;
-  --muted: rgba(232, 234, 240, 0.6);
-  --accent: #5c8cff;
-  --good: #34d399;
-  --warn: #fbbf24;
-  --bad: #f87171;
-  font-family: Inter, system-ui, -apple-system, sans-serif;
-}
-* { box-sizing: border-box; }
-html, body, #root { margin: 0; height: 100%; background: var(--bg); color: var(--text); }
-.app { display: flex; flex-direction: column; height: 100vh; }
+/* apps/jobs/frontend/src/styles.css
+   Jobs-specific layout for the Aperture HUD design language.
+   Tokens, base resets, and shared primitives live in core-web's theme.css,
+   which main.tsx imports FIRST. This file only styles jobs' own surfaces. */
 
-.nav { display: flex; gap: 8px; align-items: center; padding: 10px 16px; border-bottom: 1px solid var(--border); background: var(--panel); }
-.nav .title { font-weight: 700; margin-right: 12px; }
-.nav .spacer { flex: 1; }
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: var(--hud-bg-radial);
+  color: var(--text);
+}
+
+/* ── Top HUD rail ──────────────────────────────────────────────────────── */
+.nav {
+  display: flex;
+  gap: var(--s-2);
+  align-items: center;
+  padding: 10px var(--s-4);
+  background: var(--glass-strong);
+  border-bottom: 1px solid var(--border);
+  box-shadow: var(--el-inset);
+  backdrop-filter: blur(var(--blur-rail)) saturate(125%);
+  -webkit-backdrop-filter: blur(var(--blur-rail)) saturate(125%);
+  position: relative;
+  z-index: 10;
+}
+.nav .title {
+  font: var(--fw-semibold) var(--fs-14)/1 var(--font-sans);
+  letter-spacing: var(--tracking-tight);
+  margin-right: var(--s-3);
+  white-space: nowrap;
+}
+.nav .spacer,
 .spacer { flex: 1; }
 
-button.btn { background: rgba(255,255,255,0.06); color: var(--text); border: 1px solid var(--border); border-radius: 9px; padding: 6px 12px; font-size: 13px; cursor: pointer; }
-button.btn:hover { background: rgba(255,255,255,0.12); }
-button.btn.active { background: var(--accent); border-color: transparent; }
-button.btn.primary { background: var(--accent); border-color: transparent; }
-button.btn:disabled { opacity: 0.4; cursor: not-allowed; }
-select.btn, input.btn { appearance: none; }
+/* Active tab gets a 2px sliding accent underline (the .btn.active box-shadow
+   inset comes from theme.css; reinforce with a smooth underline transition). */
+.nav button.btn { position: relative; }
+.nav button.btn::after {
+  content: "";
+  position: absolute;
+  left: 10px; right: 10px; bottom: -11px;
+  height: 2px;
+  background: var(--accent);
+  border-radius: var(--r-pill);
+  transform: scaleX(0);
+  transform-origin: center;
+  opacity: 0;
+  transition: transform var(--t-base) var(--ease-out), opacity var(--t-base) var(--ease-out);
+}
+.nav button.btn.active::after { transform: scaleX(1); opacity: 1; }
 
-.content { flex: 1; overflow: auto; padding: 16px; }
+/* ── Scroll surface ────────────────────────────────────────────────────── */
+.content {
+  flex: 1;
+  overflow: auto;
+  padding: var(--s-4);
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-strong) transparent;
+}
+.content::-webkit-scrollbar { width: 8px; height: 8px; }
+.content::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: var(--r-pill); }
+.content::-webkit-scrollbar-track { background: transparent; }
+
 .maxw { max-width: 820px; margin: 0 auto; }
 
-textarea, input.text { width: 100%; background: rgba(0,0,0,0.3); color: var(--text); border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; font: inherit; }
-textarea { resize: vertical; min-height: 120px; }
-label.field { display: block; margin-bottom: 10px; font-size: 13px; color: var(--muted); }
-.row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-.hint { color: var(--muted); font-size: 12px; }
-.chip { display: inline-block; padding: 2px 8px; border-radius: 999px; background: rgba(255,255,255,0.08); font-size: 12px; margin: 2px; }
+.content h2 {
+  font: var(--fw-semibold) var(--fs-18)/var(--lh-tight) var(--font-sans);
+  letter-spacing: var(--tracking-tight);
+  margin: 0 0 var(--s-2);
+}
 
-.stats { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
-.stat { padding: 6px 10px; border: 1px solid var(--border); border-radius: 8px; font-size: 13px; }
-.stat b { color: var(--accent); }
+/* ── Layout helpers ────────────────────────────────────────────────────── */
+.row { display: flex; gap: var(--s-2); align-items: center; flex-wrap: wrap; }
 
-.tracker { display: grid; grid-template-columns: 360px 1fr; gap: 16px; }
-.applist { display: flex; flex-direction: column; gap: 6px; }
-.appcard { padding: 10px; border: 1px solid var(--border); border-radius: 10px; cursor: pointer; background: rgba(255,255,255,0.03); }
-.appcard.sel { border-color: var(--accent); background: rgba(92,140,255,0.1); }
-.appcard .co { color: var(--muted); font-size: 12px; }
-.status { font-size: 11px; padding: 2px 8px; border-radius: 999px; background: rgba(255,255,255,0.1); }
+label.field {
+  display: block;
+  margin-bottom: 10px;
+  font: var(--fw-semibold) var(--fs-11)/1.6 var(--font-sans);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
 
-.detail { border: 1px solid var(--border); border-radius: 12px; padding: 14px; min-height: 300px; }
-.detail h2 { margin: 0 0 4px; font-size: 18px; }
-.result { border: 1px solid var(--border); border-radius: 10px; padding: 12px; margin-top: 12px; background: rgba(255,255,255,0.03); }
-.ats { display: flex; gap: 14px; align-items: center; margin-bottom: 8px; }
-.score { font-size: 26px; font-weight: 800; }
-.score.good { color: var(--good); } .score.warn { color: var(--warn); } .score.bad { color: var(--bad); }
-details { margin: 6px 0; }
-summary { cursor: pointer; color: var(--muted); font-size: 13px; }
+/* ── KPI stat tiles ────────────────────────────────────────────────────── */
+.stats { display: flex; gap: var(--s-2); flex-wrap: wrap; margin-bottom: var(--s-3); }
+.stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: var(--s-2) var(--s-3);
+  min-width: 78px;
+  background: var(--glass-base);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  box-shadow: var(--el-1), var(--el-inset);
+  font: var(--fw-semibold) var(--fs-11)/1 var(--font-sans);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.stat b {
+  font: var(--fw-bold) var(--fs-26)/1 var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  color: var(--accent);
+  letter-spacing: normal;
+}
+
+/* ── Tracker grid ──────────────────────────────────────────────────────── */
+.tracker { display: grid; grid-template-columns: 360px 1fr; gap: var(--s-4); }
+.applist { display: flex; flex-direction: column; gap: var(--s-1); }
+
+.appcard {
+  position: relative;
+  padding: 10px var(--s-3);
+  background: var(--glass-base);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  box-shadow: var(--el-1);
+  cursor: pointer;
+  transition: background var(--t-fast) var(--ease-out),
+              border-color var(--t-fast) var(--ease-out),
+              transform var(--t-fast) var(--ease-out),
+              box-shadow var(--t-fast) var(--ease-out);
+}
+.appcard:hover {
+  border-color: var(--border-strong);
+  box-shadow: var(--el-2);
+  transform: translateY(-1px);
+}
+.appcard.sel {
+  background: var(--accent-soft);
+  border-color: var(--border-strong);
+  box-shadow: inset 3px 0 0 var(--accent), var(--el-2);
+}
+.appcard b { font: var(--fw-semibold) var(--fs-13)/1.3 var(--font-sans); }
+.appcard .co {
+  color: var(--text-muted);
+  font-size: var(--fs-12);
+  margin-top: 2px;
+}
+
+/* Status reads as a neutral pill; markup keeps the raw status text intact. */
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 9px;
+  border-radius: var(--r-pill);
+  font: var(--fw-semibold) var(--fs-11)/1 var(--font-sans);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  background: var(--glass-input);
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  white-space: nowrap;
+}
+.status::before {
+  content: "";
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  flex: 0 0 auto;
+}
+
+/* ── Detail panel ──────────────────────────────────────────────────────── */
+.detail {
+  background: var(--glass-base);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  box-shadow: var(--el-1), var(--el-inset);
+  padding: var(--s-4);
+  min-height: 300px;
+}
+.detail.hint {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+.detail h2 { margin: 0 0 var(--s-1); font-size: var(--fs-18); }
+
+.result {
+  background: var(--glass-faint);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  box-shadow: var(--el-inset);
+  padding: var(--s-3);
+  margin-top: var(--s-3);
+}
+
+details { margin: var(--s-1) 0; }
+summary {
+  cursor: pointer;
+  color: var(--text-muted);
+  font-size: var(--fs-13);
+}
+summary:hover { color: var(--text); }
+
+/* ── ATS conic gauge ───────────────────────────────────────────────────── */
+.ats { display: flex; gap: var(--s-4); align-items: center; margin-bottom: var(--s-2); }
+
+.ats-gauge {
+  --ring: var(--accent);
+  position: relative;
+  width: 56px;
+  height: 56px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: conic-gradient(var(--ring) calc(var(--pct, 0) * 1%), var(--hud-bg-3) 0);
+  display: grid;
+  place-items: center;
+  box-shadow: var(--el-inset);
+  transition: --pct var(--t-entrance) var(--ease-out);
+}
+.ats-gauge::before {
+  content: "";
+  position: absolute;
+  inset: 5px;
+  border-radius: 50%;
+  background: var(--hud-bg-2);
+  box-shadow: inset 0 1px 0 var(--border-edge-light);
+}
+.ats-gauge.good { --ring: var(--good); }
+.ats-gauge.warn { --ring: var(--warn); }
+.ats-gauge.bad  { --ring: var(--bad); }
+
+.score {
+  position: relative;
+  z-index: 1;
+  font-size: var(--fs-18);
+  font-weight: var(--fw-bold);
+}
+.score.good { color: var(--good); }
+.score.warn { color: var(--warn); }
+.score.bad  { color: var(--bad); }
+
+/* Register --pct so the gauge can animate 0 -> score where supported. */
+@property --pct {
+  syntax: "<number>";
+  inherits: false;
+  initial-value: 0;
+}

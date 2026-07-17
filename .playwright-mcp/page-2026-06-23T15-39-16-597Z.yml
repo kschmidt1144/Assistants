@@ -1,0 +1,42 @@
+- generic [ref=e3]:
+  - navigation [ref=e4]:
+    - generic [ref=e5]: 💼 Job Application Assistant
+    - button "Tracker" [ref=e6] [cursor=pointer]
+    - button "Add Job" [ref=e7] [cursor=pointer]
+    - button "Profile" [ref=e8] [cursor=pointer]
+    - generic [ref=e9]: no scraping · manual intake
+  - generic [ref=e37]:
+    - heading "Add a job" [level=2] [ref=e38]
+    - paragraph [ref=e39]: Paste the job description (no scraping — paste the text). Optionally add a URL/title.
+    - generic [ref=e40]:
+      - textbox "Title" [ref=e41]: Senior Backend Engineer
+      - textbox "Company" [ref=e42]: Acme Robotics
+    - textbox "URL (optional)" [ref=e43]: https://acme.example.com/jobs/senior-backend-123
+    - textbox "Paste the job description…" [ref=e44]: "Senior Backend Engineer — Acme Robotics (Remote, US) About the role: We are hiring a Senior Backend Engineer to design and scale the APIs that power our fleet-management platform. You will own services end to end, from schema design to production on-call. Responsibilities: - Design, build, and operate Python (FastAPI) microservices on GCP Cloud Run. - Model data in PostgreSQL and optimize high-throughput query paths. - Build event-driven pipelines with Pub/Sub and Redis. - Mentor mid-level engineers and drive code-review culture. Requirements: - 6+ years building production backend systems in Python. - Deep experience with FastAPI or similar async frameworks. - Strong SQL and data-modeling skills (PostgreSQL). - Experience operating services on Kubernetes or Cloud Run. - Familiarity with CI/CD, observability, and infrastructure-as-code (Terraform). Nice to have: - Experience with gRPC, WebSockets, and real-time systems. - Exposure to LLM/AI application development. We offer competitive comp, full remote, and strong equity."
+    - generic [ref=e45]:
+      - button "Parse JD (AI)" [ref=e49] [cursor=pointer]
+      - button "Track" [ref=e47] [cursor=pointer]
+    - generic [ref=e50]:
+      - generic [ref=e51]:
+        - generic [ref=e52]: Senior Backend Engineer
+        - generic [ref=e53]: · Senior · Remote · Full-time
+      - generic [ref=e54]:
+        - text: "Required:"
+        - generic [ref=e55]: Python
+        - generic [ref=e56]: FastAPI
+        - generic [ref=e57]: GCP Cloud Run
+        - generic [ref=e58]: PostgreSQL
+        - generic [ref=e59]: SQL
+        - generic [ref=e60]: Data Modeling
+        - generic [ref=e61]: Kubernetes
+        - generic [ref=e62]: CI/CD
+        - generic [ref=e63]: Observability
+        - generic [ref=e64]: Terraform
+        - generic [ref=e65]: Pub/Sub
+        - generic [ref=e66]: Redis
+      - generic [ref=e67]:
+        - text: "Preferred:"
+        - generic [ref=e68]: gRPC
+        - generic [ref=e69]: WebSockets
+        - generic [ref=e70]: Real-time systems
+        - generic [ref=e71]: LLM/AI application development

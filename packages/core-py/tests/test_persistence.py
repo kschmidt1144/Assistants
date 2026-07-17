@@ -77,6 +77,27 @@ async def test_fk_cascade_delete():
         transcripts = await cur.fetchall()
         assert len(transcripts) == 0
 
+async def test_delete_session_cascades(tmp_path):
+    # K6: delete_session() removes the session and cascades to transcripts + entries
+    # (no longer only reachable via raw SQL).
+    import os
+    db_path = os.path.join(tmp_path, "del.db")
+    async with Database(db_path) as db:
+        s = await db.create_session(app="meeting", title="Doomed")
+        t = await db.create_transcript(session_id=s["id"], name="raw")
+        await db.add_entry(transcript_id=t["id"], text="bye", ts=1.0)
+
+        await db.delete_session(s["id"])
+
+        assert await db.get_session(s["id"]) is None
+        cur = await db._conn.execute(
+            "SELECT COUNT(*) c FROM transcript_entries WHERE transcript_id = ?", (t["id"],)
+        )
+        assert (await cur.fetchone())["c"] == 0
+        # deleting a missing session is a no-op (no raise)
+        await db.delete_session("nope")
+
+
 async def test_connect_creates_parent_dir_and_is_idempotent(tmp_path):
     import os
     db_path = os.path.join(tmp_path, "newdir", "test.db")

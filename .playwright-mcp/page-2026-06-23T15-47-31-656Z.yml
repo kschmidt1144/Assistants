@@ -1,0 +1,31 @@
+- generic [ref=e3]:
+  - generic [ref=e4]:
+    - generic [ref=e5]: 🎙️ Meeting Copilot
+    - button "▶ Record" [ref=e6] [cursor=pointer]
+    - button "🔊 Sys" [ref=e7] [cursor=pointer]
+    - textbox "Meeting topic…" [ref=e9]
+    - generic [ref=e10]: 00:00
+    - combobox [ref=e11]:
+      - option "History…" [selected]
+      - option "Q3 Planning Sync (seeded)"
+    - button "Save" [ref=e12] [cursor=pointer]
+    - button "Export" [ref=e13] [cursor=pointer]
+    - button "Profiles" [ref=e14] [cursor=pointer]
+  - generic [ref=e15]:
+    - generic [ref=e16]:
+      - heading "Transcript" [level=3] [ref=e17]
+      - generic [ref=e19]: Press ● Record to start live transcription (Chrome).
+    - generic [ref=e20]:
+      - heading "Notes" [level=3] [ref=e21]
+      - generic [ref=e22]:
+        - generic [ref=e23]:
+          - button "Summary" [disabled] [ref=e24]
+          - button "Action items" [disabled] [ref=e25]
+          - button "Clean" [disabled] [ref=e26]
+        - generic [ref=e27]:
+          - heading "Ask" [level=4] [ref=e28]
+          - generic [ref=e29]:
+            - textbox "Ask about this meeting…" [ref=e30]
+            - button "Ask" [disabled] [ref=e31]
+          - button "Use selected text" [ref=e32] [cursor=pointer]
+        - generic [ref=e33]: Record some conversation first.

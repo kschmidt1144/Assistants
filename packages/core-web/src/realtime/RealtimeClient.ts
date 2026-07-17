@@ -21,10 +21,15 @@ export interface RealtimeOptions {
 }
 
 export class RealtimeClient {
+  /** Cap on messages buffered while the socket is connecting/reconnecting (K8). */
+  private static readonly MAX_QUEUED = 64;
+
   private ws: WebSocket | null = null;
   private intentionalClose = false;
   private retries = 0;
   private reconnectTimer: ReturnType<typeof setTimeout> | null = null;
+  /** Messages sent before the socket is OPEN, flushed on open instead of dropped (K8). */
+  private pending: ClientMessage[] = [];
 
   constructor(
     private readonly url: string,
@@ -44,6 +49,7 @@ export class RealtimeClient {
     ws.onopen = () => {
       this.retries = 0;
       this.handlers.onOpen?.();
+      this.flushPending();
     };
     ws.onmessage = (event) => this.dispatch(event.data);
     ws.onerror = () => this.handlers.onError?.("websocket error");
@@ -95,6 +101,22 @@ export class RealtimeClient {
   send(message: ClientMessage): void {
     if (this.ws?.readyState === WebSocket.OPEN) {
       this.ws.send(JSON.stringify(message));
+      return;
+    }
+    // Not open yet (initial connect or a reconnect in flight): queue and flush on open instead
+    // of silently dropping (K8). Bounded so a long outage can't grow the buffer without limit —
+    // oldest messages are dropped first. Skip entirely once intentionally closed.
+    if (this.intentionalClose) return;
+    this.pending.push(message);
+    if (this.pending.length > RealtimeClient.MAX_QUEUED) this.pending.shift();
+  }
+
+  private flushPending(): void {
+    if (this.pending.length === 0) return;
+    const queued = this.pending;
+    this.pending = [];
+    for (const message of queued) {
+      if (this.ws?.readyState === WebSocket.OPEN) this.ws.send(JSON.stringify(message));
     }
   }
 
@@ -113,6 +135,7 @@ export class RealtimeClient {
 
   close(): void {
     this.intentionalClose = true;
+    this.pending = [];
     if (this.reconnectTimer) {
       clearTimeout(this.reconnectTimer);
       this.reconnectTimer = null;

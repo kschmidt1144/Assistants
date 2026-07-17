@@ -19,16 +19,22 @@ export interface CaptureCanvasProps {
   boxH: number;
   tool: CaptureTool;
   onRegion?: (rect: Rect) => void;
+  /**
+   * The displayed feed rectangle to align to. When provided it is the source of
+   * truth (matches the natively-sized, never-upscaled `.feed-video`); otherwise
+   * we fall back to the plain object-fit-contain math.
+   */
+  rect?: Rect;
 }
 
 export const CaptureCanvas = forwardRef<CaptureCanvasHandle, CaptureCanvasProps>(
-  function CaptureCanvas({ videoW, videoH, boxW, boxH, tool, onRegion }, ref) {
+  function CaptureCanvas({ videoW, videoH, boxW, boxH, tool, onRegion, rect: rectProp }, ref) {
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
     const drawing = useRef(false);
     const regionStart = useRef<{ x: number; y: number } | null>(null);
     const [regionBox, setRegionBox] = useState<Rect | null>(null);
 
-    const rect = contentRect(videoW, videoH, boxW, boxH);
+    const rect = rectProp ?? contentRect(videoW, videoH, boxW, boxH);
     const cw = Math.max(1, Math.round(rect.w));
     const ch = Math.max(1, Math.round(rect.h));
 

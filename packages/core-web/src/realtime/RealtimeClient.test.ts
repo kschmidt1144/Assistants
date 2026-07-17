@@ -22,20 +22,36 @@ describe("RealtimeClient", () => {
     vi.clearAllTimers();
   });
 
-  it("WEB-I-02: K8 - drops messages when not OPEN", () => {
+  it("WEB-I-02: K8 - queues messages sent before OPEN and flushes them on open", () => {
     const client = new RealtimeClient("ws://localhost");
     client.connect();
 
-    // Not open yet (readyState 0)
-    client.sendText("hello");
+    // Not open yet (readyState 0): message is queued, not sent.
+    client.sendText("early");
     expect(mockWebSocket.send).not.toHaveBeenCalled();
 
-    // Now open
+    // On open, the queued message flushes in order.
     mockWebSocket.readyState = 1; // WebSocket.OPEN
     mockWebSocket.onopen?.();
+    expect(mockWebSocket.send).toHaveBeenCalledWith(JSON.stringify({ type: "text", data: "early" }));
 
-    client.sendText("hello");
-    expect(mockWebSocket.send).toHaveBeenCalledWith(JSON.stringify({ type: "text", data: "hello" }));
+    // After open, sends go straight through.
+    client.sendText("live");
+    expect(mockWebSocket.send).toHaveBeenCalledWith(JSON.stringify({ type: "text", data: "live" }));
+    expect(mockWebSocket.send).toHaveBeenCalledTimes(2);
+  });
+
+  it("WEB-I-02: K8 - does not flush messages queued before an intentional close", () => {
+    const client = new RealtimeClient("ws://localhost");
+    client.connect();
+    client.sendText("early");
+
+    client.close(); // intentional close clears the queue
+    const reopened: any = { readyState: 1, send: vi.fn(), close: vi.fn() };
+    vi.stubGlobal("WebSocket", vi.fn().mockImplementation(function () { return reopened; }));
+    client.connect();
+    reopened.onopen?.();
+    expect(reopened.send).not.toHaveBeenCalled();
   });
 
   it("WEB-I-02: handles state machine and dispatches ServerMessage", () => {

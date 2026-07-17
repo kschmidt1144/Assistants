@@ -1,0 +1,27 @@
+- generic [ref=e2]:
+  - generic [ref=e5]: Coding Copilot — start a Camera or Screen feed below, then go ⚡ Live or 🔬 analyze.
+  - generic [ref=e6]:
+    - generic [ref=e7]:
+      - button "📷 Camera" [active] [ref=e8] [cursor=pointer]
+      - button "🖥️ Screen" [ref=e9] [cursor=pointer]
+    - generic [ref=e11]:
+      - button "⚡ Live" [disabled] [ref=e12]
+      - button "🎙️" [disabled] [ref=e13]
+      - button "🔊" [ref=e15] [cursor=pointer]
+    - generic [ref=e17]:
+      - button "✏️ Draw" [disabled] [ref=e18]
+      - button "⬚ Region" [disabled] [ref=e19]
+      - button "Clear" [disabled] [ref=e20]
+      - button "🔤 OCR" [disabled] [ref=e21]
+    - generic [ref=e23]:
+      - combobox [disabled] [ref=e24]:
+        - option "⌨ Templates…" [selected]
+        - option "Review"
+        - option "Explain"
+        - option "Fix error"
+        - option "Optimize"
+        - option "Tests"
+        - option "Refactor"
+        - option "Security"
+        - option "Docs"
+      - button "⚙" [ref=e25] [cursor=pointer]

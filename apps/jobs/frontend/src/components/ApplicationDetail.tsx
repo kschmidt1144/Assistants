@@ -1,4 +1,5 @@
 import { useState } from "react";
+import type { CSSProperties } from "react";
 import { MarkdownRenderer } from "@assistants/core-web";
 import { api } from "../lib/api";
 import type { Application, TailorResult } from "../lib/types";
@@ -92,7 +93,12 @@ export function ApplicationDetail({ app, statuses, onChanged, onDeleted }: Appli
       {tailor && (
         <div className="result">
           <div className="ats">
-            <span className={`score ${scoreClass}`}>{tailor.ats.score}</span>
+            <div
+              className={`ats-gauge ${scoreClass}`}
+              style={{ "--pct": tailor.ats.score } as CSSProperties}
+            >
+              <span className={`score mono ${scoreClass}`}>{tailor.ats.score}</span>
+            </div>
             <div className="hint">ATS match · {tailor.iterations} iteration(s)</div>
             <div className="spacer" />
             <button className="btn" onClick={() => downloadText("resume.md", tailor.resume_markdown)}>Download .md</button>

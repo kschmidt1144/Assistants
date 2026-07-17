@@ -1,0 +1,129 @@
+- generic [ref=e3]:
+  - generic [ref=e4]:
+    - generic [ref=e5]: 🎙️ Meeting Copilot
+    - button "▶ Record" [ref=e6] [cursor=pointer]
+    - button "🔊 Sys" [ref=e7] [cursor=pointer]
+    - textbox "Meeting topic…" [ref=e9]: Q3 Planning Sync (seeded)
+    - generic [ref=e10]: 00:00
+    - combobox [ref=e11]:
+      - option "History…" [selected]
+      - option "Q3 Planning Sync (seeded)"
+    - button "Save" [ref=e12] [cursor=pointer]
+    - button "Export" [ref=e13] [cursor=pointer]
+    - button "Profiles" [ref=e14] [cursor=pointer]
+  - generic [ref=e15]:
+    - generic [ref=e16]:
+      - heading "Transcript" [level=3] [ref=e17]
+      - generic [ref=e18]:
+        - generic [ref=e34]:
+          - text: 19:00:01
+          - generic [ref=e35]: "Alice:"
+          - text: Thanks everyone for joining the Q3 planning sync. The main goal today is to lock the roadmap for the fleet dashboard and decide who owns the API migration.
+        - generic [ref=e36]:
+          - text: 19:00:12
+          - generic [ref=e37]: "Bob:"
+          - text: On the API migration — I think we should move off the legacy REST endpoints to the new gRPC services before we add the dashboard, otherwise we double the integration work.
+        - generic [ref=e38]:
+          - text: 19:00:28
+          - generic [ref=e39]: "Alice:"
+          - text: "Agreed. So decision one: gRPC migration happens first, in July. Bob, can you own that?"
+        - generic [ref=e40]:
+          - text: 19:00:36
+          - generic [ref=e41]: "Bob:"
+          - text: Yes, I will own the gRPC migration. I will need Carol to help with the Postgres schema changes though.
+        - generic [ref=e42]:
+          - text: 19:00:48
+          - generic [ref=e43]: "Carol:"
+          - text: I can take the schema work. I will have a migration plan drafted by next Friday and share it for review.
+        - generic [ref=e44]:
+          - text: 19:01:00
+          - generic [ref=e45]: "Alice:"
+          - text: "Great. Decision two: the dashboard MVP ships end of August, with just the live map and alerts. Carol, you draft the schema plan, Bob owns gRPC, and I will write the project brief by Wednesday."
+        - generic [ref=e46]:
+          - text: 19:01:18
+          - generic [ref=e47]: "Bob:"
+          - text: One risk — if the Redis cache work slips, the live map latency target of two hundred milliseconds is at risk. We should flag that.
+        - generic [ref=e48]:
+          - text: 19:01:30
+          - generic [ref=e49]: "Alice:"
+          - text: Noted as a risk. Lets also follow up with the platform team about Cloud Run quotas before we scale. Carol, can you send them a note?
+        - generic [ref=e50]:
+          - text: 19:01:42
+          - generic [ref=e51]: "Carol:"
+          - text: Will do, I will email the platform team about Cloud Run quotas today.
+    - generic [ref=e20]:
+      - heading "Notes" [level=3] [ref=e53]
+      - generic [ref=e22]:
+        - generic [ref=e23]:
+          - button "Summary" [ref=e24] [cursor=pointer]
+          - button "Action items" [ref=e25] [cursor=pointer]
+          - button "Clean" [ref=e26] [cursor=pointer]
+        - generic [ref=e54]:
+          - heading "Summary" [level=4] [ref=e55]
+          - heading "Q3 Planning Sync — Meeting Brief" [level=1] [ref=e56]
+          - paragraph [ref=e57]:
+            - strong [ref=e58]: "TL;DR:"
+            - text: The team locked the Q3 roadmap, prioritizing gRPC migration in July before delivering a fleet dashboard MVP by end of August.
+          - separator [ref=e59]
+          - heading "Key Discussion Points" [level=2] [ref=e60]
+          - list [ref=e61]:
+            - listitem [ref=e62]:
+              - strong [ref=e63]: "API Migration:"
+              - text: Bob advocated moving to gRPC before building the dashboard to avoid doubling integration work; the group agreed.
+            - listitem [ref=e64]:
+              - strong [ref=e65]: "Schema Changes:"
+              - text: Postgres schema updates are required to support the migration; Carol will lead this work.
+            - listitem [ref=e66]:
+              - strong [ref=e67]: "Dashboard MVP Scope:"
+              - text: Agreed to limit the August release to live map and alerts only.
+            - listitem [ref=e68]:
+              - strong [ref=e69]: "Latency Risk:"
+              - text: If the Redis cache work slips, the live map's 200 ms latency target is at risk.
+            - listitem [ref=e70]:
+              - strong [ref=e71]: "Infrastructure:"
+              - text: Cloud Run quota limits need to be confirmed with the platform team before scaling.
+          - separator [ref=e72]
+          - heading "Decisions Made" [level=2] [ref=e73]
+          - table [ref=e74]:
+            - rowgroup [ref=e75]:
+              - row "# Decision Owner Due" [ref=e76]:
+                - columnheader "#" [ref=e77]
+                - columnheader "Decision" [ref=e78]
+                - columnheader "Owner" [ref=e79]
+                - columnheader "Due" [ref=e80]
+            - rowgroup [ref=e81]:
+              - row "1 gRPC migration happens first (July) Bob July" [ref=e82]:
+                - cell "1" [ref=e83]
+                - cell "gRPC migration happens first (July)" [ref=e84]
+                - cell "Bob" [ref=e85]
+                - cell "July" [ref=e86]
+              - row "2 Postgres schema migration plan drafted and shared for review Carol Next Friday" [ref=e87]:
+                - cell "2" [ref=e88]
+                - cell "Postgres schema migration plan drafted and shared for review" [ref=e89]
+                - cell "Carol" [ref=e90]
+                - cell "Next Friday" [ref=e91]
+              - row "3 Fleet dashboard MVP (live map + alerts) ships Alice (project brief) / All End of August" [ref=e92]:
+                - cell "3" [ref=e93]
+                - cell "Fleet dashboard MVP (live map + alerts) ships" [ref=e94]
+                - cell "Alice (project brief) / All" [ref=e95]
+                - cell "End of August" [ref=e96]
+              - row "4 Project brief written Alice Wednesday" [ref=e97]:
+                - cell "4" [ref=e98]
+                - cell "Project brief written" [ref=e99]
+                - cell "Alice" [ref=e100]
+                - cell "Wednesday" [ref=e101]
+              - 'row "5 Email platform team re: Cloud Run quotas Carol Today" [ref=e102]':
+                - cell "5" [ref=e103]
+                - 'cell "Email platform team re: Cloud Run quotas" [ref=e104]'
+                - cell "Carol" [ref=e105]
+                - cell "Today" [ref=e106]
+          - separator [ref=e107]
+          - paragraph [ref=e108]:
+            - strong [ref=e109]: "Flagged Risk:"
+            - text: Redis cache delays could jeopardize the 200 ms live map latency target.
+        - generic [ref=e27]:
+          - heading "Ask" [level=4] [ref=e28]
+          - generic [ref=e29]:
+            - textbox "Ask about this meeting…" [ref=e30]
+            - button "Ask" [ref=e31] [cursor=pointer]
+          - button "Use selected text" [ref=e32] [cursor=pointer]

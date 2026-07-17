@@ -3,7 +3,7 @@
   "compilerOptions": {
     "noEmit": true,
     "noUncheckedIndexedAccess": false,
-    "types": []
+    "types": ["node"]
   },
-  "include": ["src"]
+  "include": ["src", "vitest.setup.ts"]
 }

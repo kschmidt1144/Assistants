@@ -86,6 +86,16 @@ class GeminiLiveBridge:
             await result
 
     async def _receive_loop(self) -> None:
+        # Native-audio turns surface model text twice — once via output_transcription and again
+        # via model_turn.parts[].text — so we de-dup identical fragments within a turn before
+        # emitting (K3). Reset on turn_complete so the next turn starts clean.
+        seen_text: set[str] = set()
+
+        async def emit_text(text: str | None) -> None:
+            if text and text not in seen_text:
+                seen_text.add(text)
+                await self._emit(self.on_text, text)
+
         try:
             async for response in self._session.receive():
                 sc = getattr(response, "server_content", None)
@@ -95,19 +105,19 @@ class GeminiLiveBridge:
                         await self._emit(self.on_transcript, it.text)
 
                     ot = getattr(sc, "output_transcription", None)
-                    if ot is not None and getattr(ot, "text", None):
-                        await self._emit(self.on_text, ot.text)
+                    if ot is not None:
+                        await emit_text(getattr(ot, "text", None))
 
                     mt = getattr(sc, "model_turn", None)
                     if mt is not None and getattr(mt, "parts", None):
                         for part in mt.parts:
-                            if getattr(part, "text", None):
-                                await self._emit(self.on_text, part.text)
+                            await emit_text(getattr(part, "text", None))
                             inline = getattr(part, "inline_data", None)
                             if inline is not None and getattr(inline, "data", None):
                                 await self._emit(self.on_audio, inline.data)
 
                     if getattr(sc, "turn_complete", False):
+                        seen_text.clear()
                         await self._emit(self.on_turn_complete)
         except asyncio.CancelledError:
             raise

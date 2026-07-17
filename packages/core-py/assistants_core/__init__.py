@@ -11,12 +11,14 @@ from .providers import (
     GeminiLiveBridge,
     Message,
     ProviderRouter,
+    StructuredOutputError,
     user_text,
     user_with_image,
 )
 from .realtime import RealtimeSession
 from .transcription import SpeakerIdentifier, default_embedder, pcm16_to_float32
 from .util import object_schema
+from .web import install_cors
 
 __version__ = "0.1.0"
 
@@ -32,9 +34,11 @@ __all__ = [
     "RealtimeSession",
     "Settings",
     "SpeakerIdentifier",
+    "StructuredOutputError",
     "build_registry",
     "default_embedder",
     "get_settings",
+    "install_cors",
     "object_schema",
     "parse_document",
     "pcm16_to_float32",

@@ -1,0 +1,68 @@
+- generic [ref=e2]:
+  - generic [ref=e5]:
+    - generic [ref=e6]: ⌖
+    - heading "Coding Copilot" [level=1] [ref=e7]
+    - paragraph [ref=e8]: Start a Camera or Screen feed from the deck below, then go ⚡ Live for streaming commentary or 🔬 analyze a frame. Panels float over the feed — drag, resize, and dim them to read the screen behind.
+  - region "Settings" [ref=e37]:
+    - generic [ref=e38]:
+      - img [ref=e41]
+      - generic [ref=e43]: Settings
+      - generic [ref=e44]:
+        - button "opacity" [active] [ref=e45] [cursor=pointer]:
+          - img [ref=e46]
+        - button "collapse" [ref=e48] [cursor=pointer]:
+          - img [ref=e49]
+        - button "close" [ref=e50] [cursor=pointer]:
+          - img [ref=e51]
+    - group "opacity" [ref=e80]:
+      - slider "window opacity" [ref=e81] [cursor=pointer]: "1"
+      - generic [ref=e82]: 100%
+    - generic [ref=e54]:
+      - generic [ref=e55]:
+        - generic [ref=e56]: Pinned project context
+        - textbox "Pinned project context" [ref=e57]:
+          - /placeholder: e.g. This is a FastAPI + React monorepo…
+      - generic [ref=e58]:
+        - generic [ref=e59]: Analyze model
+        - combobox "Analyze model" [ref=e60]:
+          - option "Deep (Opus 4.8)" [selected]
+          - option "Balanced (Sonnet 4.6)"
+          - option "Fast (Haiku 4.5)"
+      - generic [ref=e61]:
+        - generic [ref=e62]:
+          - text: Live frame rate
+          - generic [ref=e63]: 2 fps
+        - slider "Live frame rate 2 fps" [ref=e64] [cursor=pointer]: "2"
+      - generic [ref=e65]:
+        - generic [ref=e66]:
+          - text: Live frame quality
+          - generic [ref=e67]: "0.70"
+        - slider "Live frame quality 0.70" [ref=e68] [cursor=pointer]: "0.7"
+      - generic [ref=e69]: Frame-rate / quality changes apply next time you toggle Live.
+      - button "Reset panel layout" [ref=e71] [cursor=pointer]
+  - generic [ref=e9]:
+    - button "Move toolbar" [ref=e10]
+    - generic [ref=e11]:
+      - button "📷 Camera" [ref=e12] [cursor=pointer]
+      - button "🖥️ Screen" [ref=e13] [cursor=pointer]
+    - generic [ref=e15]:
+      - button "⚡ Live" [disabled] [ref=e16]
+      - button "Toggle microphone" [disabled] [ref=e17]: 🎙️
+      - button "🔊" [ref=e26] [cursor=pointer]
+    - generic [ref=e28]:
+      - button "✏️ Draw" [disabled] [ref=e29]
+      - button "⬚ Region" [disabled] [ref=e30]
+      - button "Clear" [disabled] [ref=e31]
+      - button "🔤 OCR" [disabled] [ref=e32]
+    - generic [ref=e34]:
+      - combobox [disabled] [ref=e35]:
+        - option "⌨ Templates…" [selected]
+        - option "Review"
+        - option "Explain"
+        - option "Fix error"
+        - option "Optimize"
+        - option "Tests"
+        - option "Refactor"
+        - option "Security"
+        - option "Docs"
+      - button "Settings" [ref=e36] [cursor=pointer]: ⚙

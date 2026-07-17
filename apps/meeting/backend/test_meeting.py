@@ -156,7 +156,7 @@ def test_meeting_crud(client):
     res = client.get("/api/meetings/missing")
     assert res.status_code == 404
 
-    # PUT overwrite (K6 issue)
+    # PUT sets title + summary.
     res = client.put(f"/api/meetings/{m_id}", json={"title": "New", "summary": "A summary"})
     assert res.status_code == 200
 
@@ -164,9 +164,21 @@ def test_meeting_crud(client):
     assert res.json()["session"]["title"] == "New"
     assert res.json()["session"]["metadata"]["summary"] == "A summary"
 
+    # K6 fixed: a title-only PUT must NOT wipe the previously stored summary metadata.
+    res = client.put(f"/api/meetings/{m_id}", json={"title": "Renamed"})
+    assert res.status_code == 200
+    res = client.get(f"/api/meetings/{m_id}")
+    assert res.json()["session"]["title"] == "Renamed"
+    assert res.json()["session"]["metadata"]["summary"] == "A summary"
+
     res = client.post("/api/meetings", data="malformed")
     assert res.status_code == 422
 
-    # Assert no DELETE (K6 scope decision)
+    # PUT/DELETE on a missing meeting → 404.
+    assert client.put("/api/meetings/missing", json={"title": "x"}).status_code == 404
+    assert client.delete("/api/meetings/missing").status_code == 404
+
+    # K6 fixed: meeting CRUD now supports delete; the meeting + its entries are removed.
     res = client.delete(f"/api/meetings/{m_id}")
-    assert res.status_code == 405
+    assert res.status_code == 200
+    assert client.get(f"/api/meetings/{m_id}").status_code == 404

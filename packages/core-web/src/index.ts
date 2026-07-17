@@ -16,6 +16,8 @@ export { useRealtime } from "./state/useRealtime";
 export type { UseRealtimeResult } from "./state/useRealtime";
 
 // UI kit
+export { HudWindow, resetHudLayout } from "./ui/HudWindow";
+export type { HudWindowProps, HudWindowState, HudTone } from "./ui/HudWindow";
 export { DraggableWindow } from "./ui/DraggableWindow";
 export type { DraggableWindowProps } from "./ui/DraggableWindow";
 export { MarkdownRenderer } from "./ui/MarkdownRenderer";

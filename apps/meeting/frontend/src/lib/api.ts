@@ -66,4 +66,6 @@ export const api = {
     req<{ added: number }>(`/api/meetings/${id}/entries`, jsonInit("POST", { entries })),
   updateMeeting: (id: string, body: { title?: string; summary?: string }) =>
     req<{ ok: boolean }>(`/api/meetings/${id}`, jsonInit("PUT", body)),
+  deleteMeeting: (id: string) =>
+    req<{ ok: boolean }>(`/api/meetings/${id}`, { method: "DELETE" }),
 };

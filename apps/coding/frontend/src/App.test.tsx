@@ -43,6 +43,8 @@ vi.mock("@assistants/core-web", () => {
       return { stop: vi.fn(), start: vi.fn() };
     }),
     DraggableWindow: ({ children }: any) => <div data-testid="draggable-window">{children}</div>,
+    HudWindow: ({ children }: any) => <div data-testid="hud-window">{children}</div>,
+    resetHudLayout: vi.fn(),
     MarkdownRenderer: ({ content }: any) => <div>{content}</div>,
   };
 });
@@ -79,10 +81,10 @@ describe("App", () => {
     expect(RealtimeClient).toHaveBeenCalledTimes(1);
     expect(mockConnect).toHaveBeenCalledTimes(1);
 
-    // Trigger a template
-    const templateSelect = screen.getByText("⌨ Templates…").closest("select") as HTMLSelectElement;
-    fireEvent.change(templateSelect, { target: { value: "review" } });
-    
+    // Open the quick-actions palette and run the "Review" task while Live is ON.
+    fireEvent.click(screen.getByRole("button", { name: "Quick actions" }));
+    fireEvent.click(screen.getByRole("option", { name: /Review the code/ }));
+
     // Because Live is ON, it should sendText instead of runAnalyze
     expect(mockSendText).toHaveBeenCalledTimes(1);
     expect(mockSendText).toHaveBeenCalledWith(expect.stringContaining("Review the code"));
@@ -91,8 +93,9 @@ describe("App", () => {
     // Turn off live
     fireEvent.click(toggleLiveBtn); // "Live" button again
 
-    // Trigger a template again
-    fireEvent.change(templateSelect, { target: { value: "review" } });
+    // Re-open the palette (it closes after running) and run "Review" again.
+    fireEvent.click(screen.getByRole("button", { name: "Quick actions" }));
+    fireEvent.click(screen.getByRole("option", { name: /Review the code/ }));
 
     // Because Live is OFF, it should runAnalyze
     expect(api.analyze).toHaveBeenCalledTimes(1);

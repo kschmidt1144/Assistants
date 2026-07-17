@@ -1,65 +1,193 @@
-:root {
-  --bg: #0b0d12;
-  --panel: rgba(20, 22, 30, 0.72);
-  --border: rgba(255, 255, 255, 0.12);
-  --text: #e8eaf0;
-  --muted: rgba(232, 234, 240, 0.6);
-  --accent: #5c8cff;
-  --live: #34d399;
-  font-family: Inter, system-ui, -apple-system, sans-serif;
+/* apps/meeting/frontend/src/styles.css
+   Meeting-specific layout for the Aperture HUD. Tokens, base resets, and shared
+   primitives live in @assistants/core-web/ui/theme.css (imported first in main.tsx).
+   Keep ONLY meeting-app layout here, expressed in design tokens. */
+
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  min-height: 0;
+  background: var(--hud-bg-radial);
 }
-* { box-sizing: border-box; }
-html, body, #root { margin: 0; height: 100%; background: var(--bg); color: var(--text); }
 
-.app { display: flex; flex-direction: column; height: 100vh; }
-
+/* ── Command rail (top bar) ─────────────────────────────────────────────── */
 .topbar {
-  display: flex; align-items: center; gap: 10px; padding: 10px 14px;
-  border-bottom: 1px solid var(--border); background: var(--panel);
-  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); flex-wrap: wrap;
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  padding: var(--s-2) var(--s-4);
+  flex-wrap: wrap;
+  background: var(--glass-strong);
+  backdrop-filter: blur(var(--blur-rail)) saturate(125%);
+  -webkit-backdrop-filter: blur(var(--blur-rail)) saturate(125%);
+  border-bottom: 1px solid var(--border);
+  box-shadow: var(--el-inset);
 }
-.topbar .title { font-weight: 700; margin-right: 6px; }
+.topbar .title {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-2);
+  font: var(--fw-semibold) var(--fs-13)/1 var(--font-sans);
+  letter-spacing: var(--tracking-tight);
+  margin-right: var(--s-1);
+  color: var(--text);
+}
 .topbar input.topic {
-  background: rgba(0,0,0,0.3); color: var(--text); border: 1px solid var(--border);
-  border-radius: 8px; padding: 6px 8px; font: inherit; min-width: 180px;
+  min-width: 180px;
+  width: auto;
+  flex: 0 1 220px;
 }
-.topbar .timer { font-variant-numeric: tabular-nums; color: var(--muted); }
+.topbar .timer {
+  color: var(--text-muted);
+  font-size: var(--fs-13);
+}
 .spacer { flex: 1; }
 
-button.btn {
-  background: rgba(255,255,255,0.06); color: var(--text); border: 1px solid var(--border);
-  border-radius: 9px; padding: 6px 10px; font-size: 13px; cursor: pointer;
+/* ── Audio level meter (sizing only; segments styled by shared .hud-meter) ─ */
+.topbar .hud-meter { flex: 0 0 auto; }
+
+/* ── Main 2-col grid (docked default) ──────────────────────────────────── */
+.main {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr 420px;
+  min-height: 0;
+  transition: grid-template-columns var(--t-collapse) var(--ease-inout);
 }
-button.btn:hover { background: rgba(255,255,255,0.12); }
-button.btn.active { background: var(--accent); border-color: transparent; }
-button.btn.rec.active { background: var(--live); color: #06281d; }
-button.btn:disabled { opacity: 0.4; cursor: not-allowed; }
-select.btn { appearance: none; }
-.level { width: 40px; height: 6px; border-radius: 3px; background: rgba(255,255,255,0.12); overflow: hidden; }
-.level > i { display: block; height: 100%; background: var(--live); }
+/* When a column is popped out into a floating HudWindow, the remaining docked
+   column takes the full width. */
+.main.solo { grid-template-columns: 1fr; }
 
-.main { flex: 1; display: grid; grid-template-columns: 1fr 420px; min-height: 0; }
-.col { min-height: 0; display: flex; flex-direction: column; }
-.col.notes { border-left: 1px solid var(--border); }
-.col h3 { margin: 0; padding: 10px 14px; font-size: 13px; color: var(--muted); border-bottom: 1px solid var(--border); }
-.scroll { flex: 1; overflow: auto; padding: 12px 14px; }
+.col {
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--hud-bg-1);
+}
+.col.notes {
+  border-left: 1px solid var(--border);
+  background: var(--hud-bg-2);
+}
+.col h3 {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  margin: 0;
+  padding: var(--s-3) var(--s-4);
+  font: var(--fw-semibold) var(--fs-11)/1 var(--font-sans);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-label);
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border);
+}
+.col h3 .spacer { flex: 1; }
+.col h3 .head-detail { color: var(--accent-300); text-transform: none; letter-spacing: 0; }
 
-.entry { margin-bottom: 8px; font-size: 14px; line-height: 1.4; }
-.entry .speaker { font-weight: 700; margin-right: 6px; }
-.entry .ts { color: var(--muted); font-size: 11px; margin-right: 6px; font-variant-numeric: tabular-nums; }
-.entry.interim { opacity: 0.55; font-style: italic; }
+.scroll { flex: 1; overflow: auto; padding: var(--s-3) var(--s-4); }
 
-.notes-block { margin-bottom: 14px; }
-.notes-block h4 { margin: 0 0 6px; font-size: 13px; }
-.action-item { padding: 6px 8px; border-radius: 8px; background: rgba(255,255,255,0.04); margin-bottom: 6px; font-size: 13px; }
-.action-item .owner { color: var(--accent); }
-.ask-row { display: flex; gap: 6px; margin-top: 6px; }
-.ask-row input { flex: 1; background: rgba(0,0,0,0.3); color: var(--text); border: 1px solid var(--border); border-radius: 8px; padding: 6px 8px; font: inherit; }
-.hint { color: var(--muted); font-size: 12px; }
+/* Header pop-out / dock toggle — a compact glyph button. */
+.pop-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px; height: 24px; padding: 0;
+  border: 1px solid transparent; border-radius: var(--r-xs);
+  background: transparent; color: var(--text-muted); cursor: pointer;
+  transition: background var(--t-fast) var(--ease-out), color var(--t-fast) var(--ease-out), border-color var(--t-fast) var(--ease-out);
+}
+.pop-btn:hover { background: var(--glass-hover); color: var(--text); border-color: var(--border-strong); }
+.pop-btn:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--accent-glow); }
 
-.modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 2000; }
-.modal { width: 360px; background: var(--panel); border: 1px solid var(--border); border-radius: 14px; padding: 16px; backdrop-filter: blur(20px); }
-.modal h3 { margin: 0 0 10px; }
-.modal input { width: 100%; background: rgba(0,0,0,0.3); color: var(--text); border: 1px solid var(--border); border-radius: 8px; padding: 6px 8px; font: inherit; margin-bottom: 10px; }
-.row { display: flex; gap: 8px; align-items: center; }
-.profile-row { display: flex; justify-content: space-between; align-items: center; padding: 4px 0; font-size: 13px; }
+/* When the column content lives inside a HudWindow, drop the dock chrome:
+   the window already provides padding/scroll, so the inner .col is a plain
+   flex body and its header is hidden (the window titlebar carries the title). */
+.hud-window-body .col { background: transparent; height: 100%; }
+.hud-window-body .col.notes { border-left: none; }
+.hud-window-body .col > h3 { display: none; }
+.hud-window-body .col .scroll { padding: 0; }
+
+/* ── Transcript entries ─────────────────────────────────────────────────── */
+.entry {
+  margin-bottom: var(--s-2);
+  padding-left: var(--s-3);
+  border-left: 3px solid var(--accent-soft);
+  font-size: var(--fs-14);
+  line-height: var(--lh-body);
+}
+.entry .speaker {
+  color: var(--accent);
+  font-weight: var(--fw-semibold);
+  margin-right: var(--s-1);
+}
+.entry .ts {
+  color: var(--text-faint);
+  font-size: var(--fs-11);
+  margin-right: var(--s-2);
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+.entry.interim {
+  opacity: 0.55;
+  font-style: italic;
+  border-left-color: var(--border-strong);
+}
+
+/* ── Notes blocks ───────────────────────────────────────────────────────── */
+.notes-block { margin-bottom: var(--s-4); }
+.notes-block h4 {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 var(--s-2);
+  font: var(--fw-semibold) var(--fs-11)/1 var(--font-sans);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-label);
+  color: var(--text-muted);
+}
+.notes-block h4 .sparkle { color: var(--accent); width: 13px; height: 13px; }
+
+.action-item {
+  padding: var(--s-2) var(--s-3);
+  border-radius: var(--r-md);
+  background: var(--glass-faint);
+  border: 1px solid var(--border);
+  box-shadow: var(--el-inset);
+  margin-bottom: var(--s-2);
+  font-size: var(--fs-13);
+  line-height: var(--lh-body);
+}
+.action-item .owner { color: var(--accent); font-weight: var(--fw-medium); }
+
+.ask-row { display: flex; gap: var(--s-2); margin-top: var(--s-2); }
+.ask-row input { flex: 1; }
+
+/* ── Modal (voice profiles) ─────────────────────────────────────────────── */
+.modal-backdrop {
+  position: fixed; inset: 0; z-index: 2000;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(5, 8, 14, 0.5);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+}
+.modal {
+  width: 360px;
+  padding: var(--s-4);
+  background: var(--glass-strong);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r-xl);
+  box-shadow: var(--el-3), var(--el-inset);
+  backdrop-filter: blur(var(--blur-modal)) saturate(125%);
+  -webkit-backdrop-filter: blur(var(--blur-modal)) saturate(125%);
+}
+.modal h3 {
+  margin: 0 0 var(--s-3);
+  font: var(--fw-semibold) var(--fs-16)/1 var(--font-sans);
+  letter-spacing: var(--tracking-tight);
+}
+.modal input { margin-bottom: var(--s-3); }
+.row { display: flex; gap: var(--s-2); align-items: center; }
+.profile-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: var(--s-1) 0; font-size: var(--fs-13);
+}

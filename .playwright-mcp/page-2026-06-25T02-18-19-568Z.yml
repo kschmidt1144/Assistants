@@ -1,0 +1,208 @@
+- generic [ref=e2]:
+  - generic [ref=e37]: Camera · 1920×1080
+  - region "Live" [ref=e74]:
+    - generic [ref=e75]:
+      - img [ref=e78]
+      - generic [ref=e80]: Live
+      - generic [ref=e81]: disconnected
+      - generic [ref=e82]:
+        - button "opacity" [ref=e83] [cursor=pointer]:
+          - img [ref=e84]
+        - button "collapse" [ref=e86] [cursor=pointer]:
+          - img [ref=e87]
+        - button "close" [ref=e88] [cursor=pointer]:
+          - img [ref=e89]
+    - generic [ref=e93]: Live commentary will stream here…
+  - region "Analysis" [ref=e40]:
+    - generic [ref=e41]:
+      - img [ref=e44]
+      - generic [ref=e46]: Analysis
+      - generic [ref=e47]:
+        - button "opacity" [ref=e48] [cursor=pointer]:
+          - img [ref=e49]
+        - button "collapse" [ref=e51] [cursor=pointer]:
+          - img [ref=e52]
+        - button "close" [ref=e53] [cursor=pointer]:
+          - img [ref=e54]
+    - generic [ref=e56]:
+      - generic [ref=e57]:
+        - generic [ref=e58]:
+          - generic [ref=e59]: user
+          - generic [ref=e60]: Review the code on screen and point out bugs, risks, and improvements.
+          - img "frame" [ref=e61]
+        - generic [ref=e103]:
+          - generic [ref=e104]: assistant
+          - heading "What's Actually on Screen" [level=2] [ref=e105]
+          - paragraph [ref=e106]:
+            - text: "I want to be straight with you:"
+            - strong [ref=e107]: there's no source code visible in this image.
+            - text: What you've attached is a rendered graphic — a dark navy canvas with a grid background, a series of horizontal colored bars (blue, green, yellow, red/pink), and the label
+            - strong [ref=e108]:
+              - code [ref=e109]: 1920×1080 SYNTHETIC FEED
+            - text: in the lower-left.
+          - paragraph [ref=e110]:
+            - text: This looks like a
+            - strong [ref=e111]: synthetic/placeholder visualization
+            - text: (e.g., a mock data feed, a loading-state skeleton, or a bar-chart render), not an editor showing code. So I can't point to line-level bugs. But I can review it as a
+            - emphasis [ref=e112]: visual artifact
+            - text: and flag likely issues in whatever code generated it.
+          - heading "Observations & Likely Risks in the Generating Code" [level=2] [ref=e113]
+          - table [ref=e114]:
+            - rowgroup [ref=e115]:
+              - row "Area Observation Risk / Improvement" [ref=e116]:
+                - columnheader "Area" [ref=e117]
+                - columnheader "Observation" [ref=e118]
+                - columnheader "Risk / Improvement" [ref=e119]
+            - rowgroup [ref=e120]:
+              - row "Data semantics Bar lengths vary with no axis, labels, or scale If this represents real data, it's unreadable — add an X-axis, gridline values, and units." [ref=e121]:
+                - cell "Data semantics" [ref=e122]:
+                  - strong [ref=e123]: Data semantics
+                - cell "Bar lengths vary with no axis, labels, or scale" [ref=e124]
+                - cell "If this represents real data, it's unreadable — add an X-axis, gridline values, and units." [ref=e125]:
+                  - text: If this represents real data, it's
+                  - strong [ref=e126]: unreadable
+                  - text: — add an X-axis, gridline values, and units.
+              - row "Color usage 4 hues (blue/green/yellow/red) appear to repeat cyclically, not by category Color should encode meaning. Cyclic coloring with no legend misleads viewers." [ref=e127]:
+                - cell "Color usage" [ref=e128]:
+                  - strong [ref=e129]: Color usage
+                - cell "4 hues (blue/green/yellow/red) appear to repeat cyclically, not by category" [ref=e130]
+                - cell "Color should encode meaning. Cyclic coloring with no legend misleads viewers." [ref=e131]
+              - row "Accessibility Red/green pairing + thin bars on dark bg Fails color-blind safety (red/green) and possibly WCAG contrast. Use a colorblind-safe palette + direct labels." [ref=e132]:
+                - cell "Accessibility" [ref=e133]:
+                  - strong [ref=e134]: Accessibility
+                - cell "Red/green pairing + thin bars on dark bg" [ref=e135]
+                - cell "Fails color-blind safety (red/green) and possibly WCAG contrast. Use a colorblind-safe palette + direct labels." [ref=e136]:
+                  - text: Fails color-blind safety (red/green) and possibly
+                  - strong [ref=e137]: WCAG contrast
+                  - text: . Use a colorblind-safe palette + direct labels.
+              - row "Resolution label Hardcoded 1920×1080 baked into the render If the canvas is resized, this text becomes a lie. Derive it from actual width/height at runtime." [ref=e138]:
+                - cell "Resolution label" [ref=e139]:
+                  - strong [ref=e140]: Resolution label
+                - cell "Hardcoded 1920×1080 baked into the render" [ref=e141]:
+                  - text: Hardcoded
+                  - code [ref=e142]: 1920×1080
+                  - text: baked into the render
+                - cell "If the canvas is resized, this text becomes a lie. Derive it from actual width/height at runtime." [ref=e143]:
+                  - text: If the canvas is resized, this text becomes a
+                  - strong [ref=e144]: lie
+                  - text: . Derive it from actual
+                  - code [ref=e145]: width
+                  - text: /
+                  - code [ref=e146]: height
+                  - text: at runtime.
+              - row "No data labels No values on bars Add value labels or tooltips so the feed is interpretable." [ref=e147]:
+                - cell "No data labels" [ref=e148]:
+                  - strong [ref=e149]: No data labels
+                - cell "No values on bars" [ref=e150]
+                - cell "Add value labels or tooltips so the feed is interpretable." [ref=e151]
+              - row "\"Synthetic\" wording Suggests fake/seeded data Ensure synthetic data is clearly flagged so it never leaks into production dashboards mistaken as real." [ref=e152]:
+                - cell "\"Synthetic\" wording" [ref=e153]:
+                  - strong [ref=e154]: "\"Synthetic\" wording"
+                - cell "Suggests fake/seeded data" [ref=e155]
+                - cell "Ensure synthetic data is clearly flagged so it never leaks into production dashboards mistaken as real." [ref=e156]:
+                  - text: Ensure synthetic data is
+                  - strong [ref=e157]: clearly flagged
+                  - text: so it never leaks into production dashboards mistaken as real.
+          - heading "If You Want a Concrete Review" [level=2] [ref=e158]
+          - paragraph [ref=e159]: "Here's how I'd structure clean code to produce this, with the fixes baked in:"
+          - generic [ref=e161]:
+            - generic [ref=e162]:
+              - generic [ref=e163]: javascript · 22 lines
+              - generic [ref=e164]:
+                - button "collapse" [ref=e165] [cursor=pointer]
+                - button "copy" [ref=e166] [cursor=pointer]
+            - code [ref=e168]: "// Derive dimensions instead of hardcoding \"1920×1080\" const { width, height } = canvas; // single source of truth ctx.fillText(`${width}×${height} SYNTHETIC FEED`, 16, height - 40); // Encode category by color via an explicit, colorblind-safe map const CATEGORY_COLORS = { primary: '#4f7cff', success: '#34d399', warning: '#f5c542', danger: '#fb6f84', }; // Validate data before drawing function drawBars(data, maxValue) { if (!Array.isArray(data) || data.length === 0) return; // guard empty const safeMax = maxValue || Math.max(...data.map(d => d.value), 1); // avoid /0 data.forEach((d, i) => { const w = (d.value / safeMax) * (width - margin); ctx.fillStyle = CATEGORY_COLORS[d.category] ?? '#888'; // fallback color ctx.fillRect(margin, y(i), Math.max(0, w), barHeight); // clamp negatives }); }"
+          - paragraph [ref=e169]: "Key defensive points encoded above:"
+          - list [ref=e170]:
+            - listitem [ref=e171]:
+              - strong [ref=e172]:
+                - text: "No"
+                - code [ref=e173]: /0
+              - text: —
+              - code [ref=e174]: safeMax
+              - text: falls back to
+              - code [ref=e175]: "1"
+              - text: .
+            - listitem [ref=e176]:
+              - strong [ref=e177]: Unknown category fallback
+              - text: color instead of
+              - code [ref=e178]: undefined
+              - text: .
+            - listitem [ref=e179]:
+              - strong [ref=e180]: Clamp negative widths
+              - text: so bad data can't draw backwards.
+            - listitem [ref=e181]:
+              - strong [ref=e182]: Dynamic resolution label
+              - text: instead of a hardcoded string.
+          - heading "Next Step" [level=2] [ref=e183]
+          - paragraph [ref=e184]:
+            - text: If you actually have
+            - strong [ref=e185]: source code
+            - text: behind this render (JS/Canvas, Python/matplotlib, SVG, a shader, etc.), paste it in and I'll give you a real line-by-line review — bugs, edge cases, and performance. Right now I'm reviewing the
+            - emphasis [ref=e186]: picture
+            - text: ", not the program."
+      - generic [ref=e63]:
+        - textbox "Ask about the code on screen… (Ctrl+Enter)" [ref=e64]
+        - button "Send" [ref=e65] [cursor=pointer]
+  - region "Settings" [ref=e187]:
+    - generic [ref=e188]:
+      - img [ref=e191]
+      - generic [ref=e193]: Settings
+      - generic [ref=e194]:
+        - button "opacity" [ref=e195] [cursor=pointer]:
+          - img [ref=e196]
+        - button "collapse" [ref=e198] [cursor=pointer]:
+          - img [ref=e199]
+        - button "close" [ref=e200] [cursor=pointer]:
+          - img [ref=e201]
+    - generic [ref=e204]:
+      - generic [ref=e205]:
+        - generic [ref=e206]: Pinned project context
+        - textbox "Pinned project context" [ref=e207]:
+          - /placeholder: e.g. This is a FastAPI + React monorepo…
+      - generic [ref=e208]:
+        - generic [ref=e209]: Analyze model
+        - combobox "Analyze model" [ref=e210]:
+          - option "Deep (Opus 4.8)" [selected]
+          - option "Balanced (Sonnet 4.6)"
+          - option "Fast (Haiku 4.5)"
+      - generic [ref=e211]:
+        - generic [ref=e212]:
+          - text: Live frame rate
+          - generic [ref=e213]: 2 fps
+        - slider "Live frame rate 2 fps" [ref=e214] [cursor=pointer]: "2"
+      - generic [ref=e215]:
+        - generic [ref=e216]:
+          - text: Live frame quality
+          - generic [ref=e217]: "0.70"
+        - slider "Live frame quality 0.70" [ref=e218] [cursor=pointer]: "0.7"
+      - generic [ref=e219]: Frame-rate / quality changes apply next time you toggle Live.
+      - button "Reset panel layout" [ref=e221] [cursor=pointer]
+  - generic [ref=e9]:
+    - button "Move toolbar" [ref=e10]
+    - generic [ref=e11]:
+      - button "📷 Camera" [ref=e12] [cursor=pointer]
+      - button "🖥️ Screen" [ref=e13] [cursor=pointer]
+      - button "⏹ Stop" [ref=e38] [cursor=pointer]
+    - generic [ref=e15]:
+      - button "⚡ Live" [ref=e230] [cursor=pointer]
+      - button "Toggle microphone" [ref=e17] [cursor=pointer]: 🎙️
+      - button "🔊" [ref=e26] [cursor=pointer]
+      - generic [ref=e39]: disconnected
+    - generic [ref=e28]:
+      - button "✏️ Draw" [ref=e29] [cursor=pointer]
+      - button "⬚ Region" [ref=e30] [cursor=pointer]
+      - button "Clear" [ref=e31] [cursor=pointer]
+      - button "🔤 OCR" [ref=e32] [cursor=pointer]
+    - generic [ref=e34]:
+      - combobox [ref=e35]:
+        - option "⌨ Templates…" [selected]
+        - option "Review"
+        - option "Explain"
+        - option "Fix error"
+        - option "Optimize"
+        - option "Tests"
+        - option "Refactor"
+        - option "Security"
+        - option "Docs"
+      - button "Settings" [active] [ref=e36] [cursor=pointer]: ⚙

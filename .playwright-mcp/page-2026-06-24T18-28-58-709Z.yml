@@ -1,0 +1,18 @@
+- generic [ref=e3]:
+  - navigation [ref=e4]:
+    - generic [ref=e5]: 💼 Job Application Assistant
+    - button "Tracker" [ref=e6] [cursor=pointer]
+    - button "Add Job" [active] [ref=e7] [cursor=pointer]
+    - button "Profile" [ref=e8] [cursor=pointer]
+    - generic [ref=e9]: no scraping · manual intake
+  - generic [ref=e20]:
+    - heading "Add a job" [level=2] [ref=e21]
+    - paragraph [ref=e22]: Paste the job description (no scraping — paste the text). Optionally add a URL/title.
+    - generic [ref=e23]:
+      - textbox "Title" [ref=e24]
+      - textbox "Company" [ref=e25]
+    - textbox "URL (optional)" [ref=e26]
+    - textbox "Paste the job description…" [ref=e27]
+    - generic [ref=e28]:
+      - button "Parse JD (AI)" [disabled] [ref=e29]
+      - button "Track" [disabled] [ref=e30]

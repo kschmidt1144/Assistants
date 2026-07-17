@@ -1,5 +1,23 @@
 import type { MeetingRow } from "../lib/api";
 
+const SEG_COUNT = 7;
+
+/** Presentational 7-segment audio LED meter driven by the 0..~0.5 RMS level. */
+function LevelMeter({ level, live }: { level: number; live: boolean }) {
+  const lit = Math.min(SEG_COUNT, Math.round(level * 14));
+  return (
+    <span className={`hud-meter${live ? "" : " off"}`} aria-hidden>
+      {Array.from({ length: SEG_COUNT }, (_, i) => {
+        const on = live && i < lit;
+        const cls = ["seg", on ? "on" : "", on && (i === 4 || i === 5) ? "warn" : "", on && i === 6 ? "peak" : ""]
+          .filter(Boolean)
+          .join(" ");
+        return <i key={i} className={cls} />;
+      })}
+    </span>
+  );
+}
+
 export interface ControlBarProps {
   speechSupported: boolean;
   live: boolean;
@@ -33,10 +51,10 @@ export function ControlBar(props: ControlBarProps) {
       <button className={`btn ${props.sysAudio ? "active" : ""}`} onClick={props.onToggleSysAudio} title="Mix system/tab audio into speaker-ID">
         🔊 Sys
       </button>
-      <span className="level"><i style={{ width: `${Math.min(100, props.level * 200)}%` }} /></span>
+      <LevelMeter level={props.level} live={props.live} />
 
-      <input className="topic" value={props.topic} placeholder="Meeting topic…" onChange={(e) => props.setTopic(e.target.value)} />
-      <span className="timer">{props.elapsedStr}</span>
+      <input className="topic hud-input" value={props.topic} placeholder="Meeting topic…" onChange={(e) => props.setTopic(e.target.value)} />
+      <span className="timer mono">{props.elapsedStr}</span>
 
       <div className="spacer" />
 

@@ -46,7 +46,7 @@ export function EnrollModal({ profiles, onClose, onEnroll, onDelete }: EnrollMod
       <div className="modal" onClick={(e) => e.stopPropagation()}>
         <h3>Voice profiles</h3>
 
-        <input value={name} placeholder="Speaker name" onChange={(e) => setName(e.target.value)} />
+        <input className="hud-input" value={name} placeholder="Speaker name" onChange={(e) => setName(e.target.value)} />
         <div className="row" style={{ marginBottom: 10 }}>
           <button className="btn" disabled={recording} onClick={() => void record()}>
             {recording ? "Recording 2s…" : "Record sample"}

@@ -33,7 +33,8 @@ vi.mock("@assistants/core-web", () => ({
     start: vi.fn(),
     stop: vi.fn(),
   })),
-  MarkdownRenderer: ({ content }: any) => <div data-testid="markdown">{content}</div>
+  MarkdownRenderer: ({ content }: any) => <div data-testid="markdown">{content}</div>,
+  HudWindow: ({ children }: any) => <div>{children}</div>,
 }));
 
 describe("App", () => {

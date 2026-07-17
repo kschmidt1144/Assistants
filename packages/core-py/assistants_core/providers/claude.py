@@ -17,6 +17,15 @@ from ..models import ModelRole, ModelSpec
 Message = dict[str, Any]
 
 
+class StructuredOutputError(ValueError):
+    """`reason_structured` got a response that wasn't valid JSON.
+
+    Raised instead of a bare `JSONDecodeError` when a structured call comes back truncated
+    (hit `max_tokens`) or refused — so callers see *why* the parse failed (K2), not an opaque
+    decode error from deep inside the SDK.
+    """
+
+
 def user_text(text: str) -> Message:
     return {"role": "user", "content": text}
 
@@ -134,7 +143,15 @@ class ClaudeClient:
             "format": {"type": "json_schema", "schema": schema},
         }
         message = await self.client.messages.create(**kwargs)
-        return json.loads(self._text_of(message))
+        text = self._text_of(message)
+        try:
+            return json.loads(text)
+        except json.JSONDecodeError as exc:
+            stop = getattr(message, "stop_reason", None)
+            raise StructuredOutputError(
+                f"structured output was not valid JSON (stop_reason={stop!r}, "
+                f"{len(text)} chars received): {text[:200]!r}"
+            ) from exc
 
     async def stream_reason(
         self,

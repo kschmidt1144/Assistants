@@ -1,5 +1,6 @@
 from assistants_core.util.structured import object_schema
 
+
 def test_object_schema():
     # default `required==all keys` + `additionalProperties:false`
     schema = object_schema(

@@ -1,9 +1,8 @@
-import json
 from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 from assistants_core.models import ModelRole, ModelSpec
-from assistants_core.providers.claude import ClaudeClient, user_text
+from assistants_core.providers.claude import ClaudeClient, StructuredOutputError, user_text
 
 
 def test_base_kwargs_gating():
@@ -63,6 +62,32 @@ def test_base_kwargs_gating():
         cache_system=True,
     )
     assert kwargs_empty["system"] == ""
+
+
+def test_haiku_gating_against_real_registry():
+    # CORE-U-06 (K1): guard the *production* role→model map, not just a synthetic one.
+    # Haiku 4.5 returns 400 if sent effort/adaptive thinking, so REASON_FAST must keep both
+    # flags off; flipping either on (and reaching the API) is the regression this catches.
+    from assistants_core.config import Settings
+    from assistants_core.models import build_registry
+
+    registry = build_registry(Settings())
+    fast = registry[ModelRole.REASON_FAST]
+    assert fast.supports_effort is False
+    assert fast.supports_thinking is False
+
+    # Deep/balanced (Opus/Sonnet) do accept both.
+    assert registry[ModelRole.REASON_DEEP].supports_effort is True
+    assert registry[ModelRole.REASON_BALANCED].supports_thinking is True
+
+    # End-to-end: kwargs built for the real Haiku spec carry neither param even when asked for.
+    client = ClaudeClient(api_key="dummy", registry=registry)
+    kwargs = client._base_kwargs(
+        fast, system="sys", messages=[], max_tokens=100,
+        effort="high", thinking=True, cache_system=True,
+    )
+    assert "output_config" not in kwargs
+    assert "thinking" not in kwargs
 
 
 class FakeTextBlock:
@@ -141,14 +166,24 @@ async def test_reason_structured(fake_claude_client):
     assert kwargs["output_config"]["format"]["type"] == "json_schema"
     assert kwargs["output_config"]["format"]["schema"] == schema
 
-    # Test malformed JSON (K2)
-    mock_messages.create.return_value = FakeMessage([FakeTextBlock('{"key": "truncated')])
-    with pytest.raises(json.JSONDecodeError):
+    # Test malformed JSON (K2): a truncated/refused response surfaces a clear
+    # StructuredOutputError carrying stop_reason, not an opaque JSONDecodeError.
+    truncated = FakeMessage([FakeTextBlock('{"key": "truncated')])
+    truncated.stop_reason = "max_tokens"
+    mock_messages.create.return_value = truncated
+    with pytest.raises(StructuredOutputError, match="max_tokens"):
         await client.reason_structured(
             schema=schema,
             system="sys",
             messages=[],
             role=ModelRole.REASON_DEEP,
+        )
+
+    # Empty response (e.g. refusal with no text) also raises, not returns None.
+    mock_messages.create.return_value = FakeMessage([])
+    with pytest.raises(StructuredOutputError):
+        await client.reason_structured(
+            schema=schema, system="sys", messages=[], role=ModelRole.REASON_DEEP
         )
 
 

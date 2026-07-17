@@ -12,12 +12,11 @@ from __future__ import annotations
 from contextlib import asynccontextmanager
 from typing import Any
 
-from assistants_core import ProviderRouter, get_settings, parse_document, user_text
+from assistants_core import ProviderRouter, get_settings, install_cors, parse_document, user_text
 from assistants_core.models import ModelRole
 from fastapi import FastAPI, File, HTTPException, UploadFile
-from fastapi.middleware.cors import CORSMiddleware
 from prompts import COVER_SYSTEM, PARSE_SYSTEM, PARSED_JOB_SCHEMA, QA_SYSTEM
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
 from resume import tailor_and_score
 from store import STATUSES, JobsStore
 
@@ -36,12 +35,7 @@ async def lifespan(_app: FastAPI):
 
 
 app = FastAPI(title="Job Application Assistant", lifespan=lifespan)
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["http://localhost:5175"],
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+install_cors(app, ["http://localhost:5175"])  # scoped (not "*"); keeps CORS headers on 500s
 
 
 def store() -> JobsStore:
@@ -112,6 +106,14 @@ class UpdateApp(BaseModel):
     status: str | None = None
     notes: str | None = None
 
+    @field_validator("status")
+    @classmethod
+    def _known_status(cls, v: str | None) -> str | None:
+        # K4: reject bogus statuses (→ 422) instead of persisting an off-workflow value.
+        if v is not None and v not in STATUSES:
+            raise ValueError(f"status must be one of {STATUSES}")
+        return v
+
 
 @app.post("/api/applications")
 async def create_application(req: CreateApp) -> dict[str, Any]:
@@ -169,13 +171,25 @@ async def set_profile(req: SetProfile) -> dict[str, bool]:
     return {"ok": True}
 
 
+MAX_UPLOAD_BYTES = 10 * 1024 * 1024  # 10 MB — a resume well above any real one
+
+
 @app.post("/api/profile/upload")
 async def upload_profile(file: UploadFile = File(...)) -> dict[str, object]:
     data = await file.read()
+    if not data:
+        raise HTTPException(400, "empty file")
+    if len(data) > MAX_UPLOAD_BYTES:
+        raise HTTPException(413, f"file too large (max {MAX_UPLOAD_BYTES // (1024 * 1024)} MB)")
+    filename = file.filename or "resume.txt"
     try:
-        text = parse_document(data, file.filename or "resume.txt")
-    except ValueError as e:
+        text = parse_document(data, filename)
+    except ValueError as e:  # unsupported extension — parse_document signals this as ValueError
         raise HTTPException(400, str(e)) from e
+    except Exception as e:  # noqa: BLE001 — corrupt/malformed file (e.g. pypdf) → 400, not 500 (K5)
+        raise HTTPException(400, f"could not parse {filename}: {e}") from e
+    if not text.strip():
+        raise HTTPException(400, "no text could be extracted from the file")
     await store().set_profile(text)
     return {"ok": True, "chars": len(text)}
 

@@ -1,4 +1,4 @@
-from .claude import ClaudeClient, Message, user_text, user_with_image
+from .claude import ClaudeClient, Message, StructuredOutputError, user_text, user_with_image
 from .gemini_live import GeminiLiveBridge
 from .router import ProviderRouter
 
@@ -7,6 +7,7 @@ __all__ = [
     "GeminiLiveBridge",
     "Message",
     "ProviderRouter",
+    "StructuredOutputError",
     "user_text",
     "user_with_image",
 ]

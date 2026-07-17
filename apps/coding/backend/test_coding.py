@@ -1,5 +1,7 @@
-from unittest.mock import AsyncMock, MagicMock
+from unittest.mock import AsyncMock
 
+import anthropic
+import httpx
 import main
 import pytest
 from assistants_core.models import ModelRole
@@ -110,6 +112,29 @@ def test_ocr(client, mock_claude, monkeypatch):
     kwargs = mock_claude.call_args[1]
     assert kwargs["role"] == ModelRole.REASON_FAST
     assert kwargs["thinking"] is False
+
+
+def test_analyze_provider_error_is_clean_http_error(client, monkeypatch):
+    # COD-I-06: a provider/network failure (incl. for image requests) must surface as a normal
+    # HTTP error so the response keeps its CORS headers — an *unhandled* exception 500s outside
+    # CORSMiddleware, which the browser silently reports as "Failed to fetch".
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "test")
+    main.get_settings.cache_clear()
+    boom = anthropic.APIConnectionError(
+        message="upstream boom",
+        request=httpx.Request("POST", "https://api.anthropic.com/v1/messages"),
+    )
+    monkeypatch.setattr(main.router.claude, "reason", AsyncMock(side_effect=boom))
+
+    # Image present (the case the bug report worried about) — thinking stays on; the error is caught.
+    resp = client.post("/api/analyze", json={"text": "Look", "image": "b64"})
+    assert resp.status_code == 502
+    assert "upstream boom" in resp.json()["detail"]
+
+    # OCR is protected the same way.
+    resp = client.post("/api/ocr", json={"image": "b64"})
+    assert resp.status_code == 502
+    assert "upstream boom" in resp.json()["detail"]
 
 
 class FakeBridge:

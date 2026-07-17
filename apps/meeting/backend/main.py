@@ -19,13 +19,13 @@ from assistants_core import (
     ProviderRouter,
     SpeakerIdentifier,
     get_settings,
+    install_cors,
     object_schema,
     pcm16_to_float32,
     user_text,
 )
 from assistants_core.models import ModelRole
 from fastapi import FastAPI, HTTPException
-from fastapi.middleware.cors import CORSMiddleware
 from prompts import ACTION_ITEMS_SYSTEM, ASK_SYSTEM, CLEAN_SYSTEM, SUMMARY_SYSTEM
 from pydantic import BaseModel
 
@@ -47,12 +47,7 @@ async def lifespan(_app: FastAPI):
 
 
 app = FastAPI(title="Meeting Copilot", lifespan=lifespan)
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["http://localhost:5174"],
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+install_cors(app, ["http://localhost:5174"])  # scoped (not "*"); keeps CORS headers on 500s
 
 
 def db() -> Database:
@@ -238,6 +233,22 @@ async def append_entries(meeting_id: str, req: AppendEntries) -> dict[str, int]:
 
 @app.put("/api/meetings/{meeting_id}")
 async def update_meeting(meeting_id: str, req: UpdateMeeting) -> dict[str, bool]:
-    metadata = {"summary": req.summary} if req.summary is not None else None
+    session = await db().get_session(meeting_id)
+    if not session:
+        raise HTTPException(404, "meeting not found")
+    # K6: merge summary into existing metadata instead of overwriting it wholesale.
+    metadata = None
+    if req.summary is not None:
+        metadata = {**(session.get("metadata") or {}), "summary": req.summary}
     await db().update_session(meeting_id, title=req.title, metadata=metadata)
+    return {"ok": True}
+
+
+@app.delete("/api/meetings/{meeting_id}")
+async def delete_meeting(meeting_id: str) -> dict[str, bool]:
+    # K6: meeting CRUD now includes delete; transcript + entries cascade in the core DB.
+    session = await db().get_session(meeting_id)
+    if not session:
+        raise HTTPException(404, "meeting not found")
+    await db().delete_session(meeting_id)
     return {"ok": True}

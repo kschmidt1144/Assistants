@@ -11,10 +11,17 @@ Run (from this dir, with the repo-root venv):
 
 from __future__ import annotations
 
-from assistants_core import ProviderRouter, RealtimeSession, get_settings, user_text, user_with_image
+import anthropic
+from assistants_core import (
+    ProviderRouter,
+    RealtimeSession,
+    get_settings,
+    install_cors,
+    user_text,
+    user_with_image,
+)
 from assistants_core.models import ModelRole
 from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect
-from fastapi.middleware.cors import CORSMiddleware
 from prompts import CODING_ANALYSIS_SYSTEM, CODING_LIVE_SYSTEM, OCR_PROMPT, OCR_SYSTEM
 from pydantic import BaseModel
 
@@ -22,12 +29,7 @@ APP_NAME = "coding"
 router = ProviderRouter()
 
 app = FastAPI(title="Coding Copilot")
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["http://localhost:5173"],  # scoped (not "*")
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+install_cors(app, ["http://localhost:5173"])  # scoped (not "*"); keeps CORS headers on 500s
 
 
 # ── meta ──────────────────────────────────────────────────────────────────────
@@ -72,6 +74,13 @@ async def ws_live(ws: WebSocket) -> None:
 _ANALYZE_ROLES = {ModelRole.REASON_DEEP, ModelRole.REASON_BALANCED, ModelRole.REASON_FAST}
 
 
+def _provider_detail(exc: anthropic.APIError) -> str:
+    """Readable one-line detail for a Claude API failure (status + message when present)."""
+    status = getattr(exc, "status_code", None)
+    message = getattr(exc, "message", None) or str(exc)
+    return f"Claude API error ({status}): {message}" if status else f"Claude API error: {message}"
+
+
 class AnalyzeRequest(BaseModel):
     text: str
     image: str | None = None  # base64 JPEG (no data: prefix)
@@ -95,7 +104,14 @@ async def analyze(req: AnalyzeRequest) -> dict[str, str]:
         system += f"\n\nProject context:\n{req.context}"
     message = user_with_image(req.text, req.image) if req.image else user_text(req.text)
 
-    out = await router.claude.reason(role=role, system=system, messages=[message])
+    try:
+        # Note: adaptive thinking + an image is a valid request on Opus; the model spec gates
+        # thinking, so screenshots still get deep reasoning. We catch provider/network errors and
+        # re-raise as an HTTPException so the response keeps its CORS headers — an *unhandled*
+        # exception 500s outside CORSMiddleware, which the browser reports as "Failed to fetch".
+        out = await router.claude.reason(role=role, system=system, messages=[message])
+    except anthropic.APIError as exc:
+        raise HTTPException(502, _provider_detail(exc)) from exc
     return {"response": out, "model": router.model_id(role)}
 
 
@@ -108,10 +124,13 @@ class OcrRequest(BaseModel):
 async def ocr(req: OcrRequest) -> dict[str, str]:
     if not get_settings().has_anthropic:
         raise HTTPException(400, "ANTHROPIC_API_KEY not set")
-    out = await router.claude.reason(
-        role=ModelRole.REASON_FAST,
-        system=OCR_SYSTEM,
-        messages=[user_with_image(OCR_PROMPT, req.image)],
-        thinking=False,
-    )
+    try:
+        out = await router.claude.reason(
+            role=ModelRole.REASON_FAST,  # Haiku 4.5 → thinking unsupported (gated by the model spec)
+            system=OCR_SYSTEM,
+            messages=[user_with_image(OCR_PROMPT, req.image)],
+            thinking=False,
+        )
+    except anthropic.APIError as exc:
+        raise HTTPException(502, _provider_detail(exc)) from exc
     return {"text": out}

@@ -1,11 +1,40 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { AudioWorkletCapture, SpeechTranscription } from "@assistants/core-web";
+import type { ReactNode } from "react";
+import { AudioWorkletCapture, HudWindow, SpeechTranscription } from "@assistants/core-web";
 import { ControlBar } from "./components/ControlBar";
 import { EnrollModal } from "./components/EnrollModal";
 import { NotesPanel } from "./components/NotesPanel";
 import { TranscriptView } from "./components/TranscriptView";
 import { api, type ActionItem, type MeetingRow, type VoiceProfile } from "./lib/api";
 import { download, elapsed, entriesToText, type Entry } from "./lib/format";
+
+// ── pop-out persistence ────────────────────────────────────────────────────
+function loadPop(key: string): boolean {
+  if (typeof localStorage === "undefined") return false;
+  return localStorage.getItem(key) === "1";
+}
+function storePop(key: string, on: boolean): void {
+  if (typeof localStorage === "undefined") return;
+  try {
+    if (on) localStorage.setItem(key, "1");
+    else localStorage.removeItem(key);
+  } catch {
+    /* private mode — non-fatal */
+  }
+}
+const POP_TRANSCRIPT = "meeting.pop.transcript";
+const POP_NOTES = "meeting.pop.notes";
+
+// ── header pop-out / dock toggle buttons ───────────────────────────────────
+const ICON_POP_OUT = "M14 4h6v6M20 4l-8 8M9 5H5a1 1 0 0 0-1 1v13a1 1 0 0 0 1 1h13a1 1 0 0 0 1-1v-4";
+const ICON_DOCK_IN = "M4 14h6v6M10 14l-8 8M15 5h4a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1v-4";
+function PopGlyph({ d }: { d: string }) {
+  return (
+    <svg viewBox="0 0 24 24" width={14} height={14} fill="none" stroke="currentColor" strokeWidth={1.9} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+      <path d={d} />
+    </svg>
+  );
+}
 
 export function App() {
   const speechRef = useRef<SpeechTranscription | null>(null);
@@ -31,6 +60,18 @@ export function App() {
 
   const [profiles, setProfiles] = useState<VoiceProfile[]>([]);
   const [showProfiles, setShowProfiles] = useState(false);
+
+  // Poppable panels: docked-in-grid by default, floatable into HudWindows.
+  const [transcriptPopped, setTranscriptPopped] = useState(() => loadPop(POP_TRANSCRIPT));
+  const [notesPopped, setNotesPopped] = useState(() => loadPop(POP_NOTES));
+  const setTranscriptPop = useCallback((on: boolean) => {
+    storePop(POP_TRANSCRIPT, on);
+    setTranscriptPopped(on);
+  }, []);
+  const setNotesPop = useCallback((on: boolean) => {
+    storePop(POP_NOTES, on);
+    setNotesPopped(on);
+  }, []);
 
   const [summary, setSummary] = useState("");
   const [actionItems, setActionItems] = useState<ActionItem[]>([]);
@@ -248,24 +289,79 @@ export function App() {
         onOpenProfiles={() => setShowProfiles(true)}
       />
 
-      <div className="main">
-        <TranscriptView entries={entries} interim={interim} currentSpeaker={currentSpeaker} />
-        <NotesPanel
-          hasTranscript={entries.length > 0}
-          busy={busy}
-          summary={summary}
-          actionItems={actionItems}
-          cleaned={cleaned}
-          answer={answer}
-          question={question}
-          setQuestion={setQuestion}
-          onSummary={onSummary}
-          onActions={onActions}
-          onClean={onClean}
-          onAsk={onAsk}
-          onUseSelection={onUseSelection}
-        />
-      </div>
+      {(() => {
+        const popOutBtn = (label: string, onClick: () => void): ReactNode => (
+          <button type="button" className="pop-btn" aria-label={label} title={label} onClick={onClick}>
+            <PopGlyph d={ICON_POP_OUT} />
+          </button>
+        );
+        const dockInBtn = (label: string, onClick: () => void): ReactNode => (
+          <button type="button" className="pop-btn" aria-label={label} title={label} onClick={onClick}>
+            <PopGlyph d={ICON_DOCK_IN} />
+          </button>
+        );
+
+        const transcript = (extra: ReactNode) => (
+          <TranscriptView entries={entries} interim={interim} currentSpeaker={currentSpeaker} headerExtra={extra} />
+        );
+        const notes = (extra: ReactNode) => (
+          <NotesPanel
+            hasTranscript={entries.length > 0}
+            busy={busy}
+            summary={summary}
+            actionItems={actionItems}
+            cleaned={cleaned}
+            answer={answer}
+            question={question}
+            setQuestion={setQuestion}
+            onSummary={onSummary}
+            onActions={onActions}
+            onClean={onClean}
+            onAsk={onAsk}
+            onUseSelection={onUseSelection}
+            headerExtra={extra}
+          />
+        );
+
+        const solo = transcriptPopped !== notesPopped;
+
+        return (
+          <>
+            <div className={`main${solo ? " solo" : ""}`}>
+              {!transcriptPopped && transcript(popOutBtn("Pop out transcript", () => setTranscriptPop(true)))}
+              {!notesPopped && notes(popOutBtn("Pop out notes", () => setNotesPop(true)))}
+            </div>
+
+            {transcriptPopped && (
+              <HudWindow
+                id="meeting.transcript"
+                title="Transcript"
+                statusPill={live ? { label: "Live", tone: "live" } : undefined}
+                defaultPos={{ x: 24, y: 80 }}
+                defaultSize={{ w: 520, h: 420 }}
+                headerActions={dockInBtn("Dock transcript", () => setTranscriptPop(false))}
+                onClose={() => setTranscriptPop(false)}
+              >
+                {transcript(null)}
+              </HudWindow>
+            )}
+
+            {notesPopped && (
+              <HudWindow
+                id="meeting.notes"
+                title="Notes"
+                statusPill={busy ? { label: busy, tone: "neutral" } : undefined}
+                defaultPos={{ x: Math.max(24, window.innerWidth - 460), y: 80 }}
+                defaultSize={{ w: 420, h: 420 }}
+                headerActions={dockInBtn("Dock notes", () => setNotesPop(false))}
+                onClose={() => setNotesPop(false)}
+              >
+                {notes(null)}
+              </HudWindow>
+            )}
+          </>
+        );
+      })()}
 
       {showProfiles && (
         <EnrollModal

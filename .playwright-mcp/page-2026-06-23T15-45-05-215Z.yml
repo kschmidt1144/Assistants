@@ -1,0 +1,33 @@
+- generic [ref=e3]:
+  - navigation [ref=e4]:
+    - generic [ref=e5]: 💼 Job Application Assistant
+    - button "Tracker" [ref=e6] [cursor=pointer]
+    - button "Add Job" [ref=e7] [cursor=pointer]
+    - button "Profile" [ref=e8] [cursor=pointer]
+    - generic [ref=e9]: no scraping · manual intake
+  - generic [ref=e162]:
+    - generic [ref=e163]:
+      - generic [ref=e164]: Applied 1
+      - generic [ref=e165]: New 1
+    - combobox [ref=e167]:
+      - option "All statuses"
+      - option "New"
+      - option "Interested"
+      - option "Applied" [selected]
+      - option "Interviewing"
+      - option "Offer"
+      - option "Rejected"
+      - option "Withdrawn"
+    - generic [ref=e168]:
+      - generic [ref=e169]:
+        - generic [ref=e170] [cursor=pointer]:
+          - generic [ref=e171]:
+            - generic [ref=e172]: Senior Backend Engineer (DEDUP TEST)
+            - generic [ref=e173]: Applied
+          - generic [ref=e174]: Acme Robotics
+        - generic [ref=e175] [cursor=pointer]:
+          - generic [ref=e176]:
+            - generic [ref=e177]: Software Engineer
+            - generic [ref=e178]: New
+          - generic [ref=e179]: Acme Corp
+      - generic [ref=e181]: Select an application to view details and run AI actions.

@@ -1,0 +1,31 @@
+- generic [ref=e2]:
+  - generic [ref=e5]:
+    - generic [ref=e6]: ⌖
+    - heading "Coding Copilot" [level=1] [ref=e7]
+    - paragraph [ref=e8]: Start a Camera or Screen feed from the deck below, then go ⚡ Live for streaming commentary or 🔬 analyze a frame. Panels float over the feed — drag, resize, and dim them to read the screen behind.
+  - generic [ref=e9]:
+    - button "Move toolbar" [ref=e10]
+    - generic [ref=e11]:
+      - button "📷 Camera" [ref=e12] [cursor=pointer]
+      - button "🖥️ Screen" [ref=e13] [cursor=pointer]
+    - generic [ref=e15]:
+      - button "⚡ Live" [disabled] [ref=e16]
+      - button "Toggle microphone" [disabled] [ref=e17]: 🎙️
+      - button "🔊" [ref=e26] [cursor=pointer]
+    - generic [ref=e28]:
+      - button "✏️ Draw" [disabled] [ref=e29]
+      - button "⬚ Region" [disabled] [ref=e30]
+      - button "Clear" [disabled] [ref=e31]
+      - button "🔤 OCR" [disabled] [ref=e32]
+    - generic [ref=e34]:
+      - combobox [disabled] [ref=e35]:
+        - option "⌨ Templates…" [selected]
+        - option "Review"
+        - option "Explain"
+        - option "Fix error"
+        - option "Optimize"
+        - option "Tests"
+        - option "Refactor"
+        - option "Security"
+        - option "Docs"
+      - button "Settings" [ref=e36] [cursor=pointer]: ⚙

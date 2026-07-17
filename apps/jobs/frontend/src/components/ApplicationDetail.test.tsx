@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { ApplicationDetail } from "./ApplicationDetail";
 import { api } from "../lib/api";
+import type { Application } from "../lib/types";
 import React from "react";
 
 vi.mock("../lib/api", () => ({
@@ -18,16 +19,17 @@ vi.mock("@assistants/core-web", () => ({
   MarkdownRenderer: () => <div data-testid="markdown" />
 }));
 
-const mockApp = {
+const mockApp: Application = {
   id: "app-1",
   title: "Title",
   company: "Company",
   url: "",
   location: "",
   jd_text: "",
+  parsed_data: null,
   status: "APPLIED",
   notes: "Some notes",
-  status_history: [{ status: "APPLIED", ts: 0 }],
+  status_history: [{ status: "APPLIED", date: 0 }],
   created_at: 0,
   updated_at: 0,
 };

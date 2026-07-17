@@ -1,0 +1,64 @@
+- generic [ref=e2]:
+  - generic [ref=e37]: Camera · 1920×1080 · live
+  - region "Live" [ref=e74]:
+    - generic [ref=e75]:
+      - img [ref=e78]
+      - generic [ref=e80]: Live
+      - generic [ref=e81]: connecting
+      - generic [ref=e82]:
+        - button "opacity" [ref=e83] [cursor=pointer]:
+          - img [ref=e84]
+        - button "collapse" [ref=e86] [cursor=pointer]:
+          - img [ref=e87]
+        - button "close" [ref=e88] [cursor=pointer]:
+          - img [ref=e89]
+    - generic [ref=e93]: Live commentary will stream here…
+  - region "Analysis" [ref=e40]:
+    - generic [ref=e41]:
+      - img [ref=e44]
+      - generic [ref=e46]: Analysis
+      - generic [ref=e47]:
+        - button "opacity" [ref=e48] [cursor=pointer]:
+          - img [ref=e49]
+        - button "collapse" [ref=e51] [cursor=pointer]:
+          - img [ref=e52]
+        - button "close" [ref=e53] [cursor=pointer]:
+          - img [ref=e54]
+    - generic [ref=e56]:
+      - generic [ref=e57]:
+        - generic [ref=e58]:
+          - generic [ref=e59]: user
+          - generic [ref=e60]: Review the code on screen and point out bugs, risks, and improvements.
+          - img "frame" [ref=e61]
+        - generic [ref=e62]: analyzing…
+      - generic [ref=e63]:
+        - textbox "Ask about the code on screen… (Ctrl+Enter)" [ref=e64]
+        - button "Send" [disabled] [ref=e65]
+  - generic [ref=e9]:
+    - button "Move toolbar" [ref=e10]
+    - generic [ref=e11]:
+      - button "📷 Camera" [ref=e12] [cursor=pointer]
+      - button "🖥️ Screen" [ref=e13] [cursor=pointer]
+      - button "⏹ Stop" [ref=e38] [cursor=pointer]
+    - generic [ref=e15]:
+      - button "● Live" [active] [ref=e102] [cursor=pointer]
+      - button "Toggle microphone" [ref=e17] [cursor=pointer]: 🎙️
+      - button "🔊" [ref=e26] [cursor=pointer]
+      - generic [ref=e39]: connecting
+    - generic [ref=e28]:
+      - button "✏️ Draw" [ref=e29] [cursor=pointer]
+      - button "⬚ Region" [ref=e30] [cursor=pointer]
+      - button "Clear" [ref=e31] [cursor=pointer]
+      - button "🔤 OCR" [disabled] [ref=e32]
+    - generic [ref=e34]:
+      - combobox [ref=e35]:
+        - option "⌨ Templates…" [selected]
+        - option "Review"
+        - option "Explain"
+        - option "Fix error"
+        - option "Optimize"
+        - option "Tests"
+        - option "Refactor"
+        - option "Security"
+        - option "Docs"
+      - button "Settings" [ref=e36] [cursor=pointer]: ⚙

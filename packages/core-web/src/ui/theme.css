@@ -1,0 +1,426 @@
+/* packages/core-web/src/ui/theme.css
+   Aperture HUD — the single source of truth for the refined-glass HUD design
+   language shared by all three apps. Imported (before the app's own styles.css)
+   via:  import "@assistants/core-web/ui/theme.css";
+   (the "./ui/theme.css" subpath is declared in core-web's package.json "exports").
+
+   Apps keep ONLY their app-specific layout rules in their own styles.css; tokens,
+   shared primitives, and the HudWindow chrome all live here. */
+
+:root {
+  /* ── Background layers (deep navy, never pure black) ───────────────── */
+  --hud-bg-0: #070a12;   /* app void / behind the coding feed */
+  --hud-bg-1: #0c1019;   /* base surface for non-overlay apps (jobs/meeting content) */
+  --hud-bg-2: #11161f;   /* raised surface (cards, nav rails) */
+  --hud-bg-3: #161c28;   /* highest static surface (inputs, hover rows) */
+  --hud-bg-radial: radial-gradient(120% 100% at 50% -10%, #131a28 0%, #0b0f18 46%, #070a12 100%);
+
+  /* ── Glass surface fills (functional translucency — screen reads through) */
+  --glass-thin:   rgba(16, 21, 32, 0.58);  /* coding overlay panels (most see-through) */
+  --glass-base:   rgba(15, 19, 30, 0.72);  /* default panel body / cards */
+  --glass-strong: rgba(13, 17, 27, 0.84);  /* title bars, control bar, modals, nav rails */
+  --glass-faint:  rgba(20, 26, 40, 0.40);  /* unfocused panel body, hover scrims */
+  --glass-input:  rgba(0, 0, 0, 0.32);     /* sunken input wells inside glass */
+  --glass-hover:  rgba(124, 158, 255, 0.10);
+  --glass-press:  rgba(124, 158, 255, 0.18);
+  --glass-msg:    rgba(255, 255, 255, 0.045); /* assistant chat bubble */
+
+  /* ── Borders & hairlines (cool, top edge brighter = "lit from above") */
+  --border:            rgba(150, 175, 255, 0.13);
+  --border-strong:     rgba(150, 175, 255, 0.24);
+  --border-edge-light: rgba(180, 200, 255, 0.22);  /* 1px inset top highlight */
+  --border-inner:      rgba(0, 0, 0, 0.34);         /* 1px inset bottom shadow line */
+  --border-focus:      rgba(124, 158, 255, 0.70);
+
+  /* ── Text ──────────────────────────────────────────────────────────── */
+  --text:        #eef1f8;
+  --text-muted:  rgba(238, 241, 248, 0.62);
+  --text-faint:  rgba(238, 241, 248, 0.40);
+  --text-on-accent: #06122e;
+
+  /* ── Accent ramp (the #5c8cff family — anchor unchanged) ───────────── */
+  --accent-700:  #2f5fe6;
+  --accent-600:  #3f6dff;
+  --accent:      #5c8cff;
+  --accent-400:  #82a6ff;
+  --accent-300:  #a8c2ff;
+  --accent-soft: rgba(92, 140, 255, 0.16);   /* tinted fills, user-msg, selected card */
+  --accent-wash: rgba(92, 140, 255, 0.10);   /* faint cluster wash */
+  --accent-glow: rgba(92, 140, 255, 0.45);   /* focus rim / live ring color */
+
+  /* ── Status ────────────────────────────────────────────────────────── */
+  --live:      #35d6a0;
+  --live-glow: rgba(53, 214, 160, 0.50);
+  --good:      #35d6a0;  --good-soft: rgba(53, 214, 160, 0.16);
+  --warn:      #f6c049;  --warn-soft: rgba(246, 192, 73, 0.16);
+  --bad:       #ff6b6b;  --bad-soft:  rgba(255, 107, 107, 0.16);
+
+  /* ── Blur radii ────────────────────────────────────────────────────── */
+  --blur-panel: 22px;  /* floating panels + control bar */
+  --blur-rail:  16px;  /* nav/topbar rails */
+  --blur-modal: 30px;  /* modals */
+
+  /* ── Radius scale ──────────────────────────────────────────────────── */
+  --r-xs: 6px;     /* chips, level meter segments */
+  --r-sm: 9px;     /* buttons, inputs */
+  --r-md: 12px;    /* cards, menus, KPI tiles */
+  --r-lg: 16px;    /* floating panels, control bar */
+  --r-xl: 20px;    /* modals */
+  --r-pill: 999px; /* status pills, segmented toggles */
+
+  /* ── Spacing scale (4px base) ──────────────────────────────────────── */
+  --s-1:4px; --s-2:8px; --s-3:12px; --s-4:16px; --s-5:20px; --s-6:24px; --s-8:32px;
+
+  /* ── Elevation / shadow layers ─────────────────────────────────────── */
+  --el-1: 0 1px 2px rgba(0,0,0,0.30);
+  --el-2: 0 6px 18px rgba(0,0,0,0.40);                          /* resting panel */
+  --el-3: 0 14px 44px rgba(0,0,0,0.52);                         /* control bar / hover lift */
+  --el-focus: 0 18px 56px rgba(0,0,0,0.55),
+              0 0 0 1px var(--accent-soft),
+              0 0 28px -6px var(--accent-glow);                 /* focused panel rim-glow */
+  --el-inset: inset 0 1px 0 var(--border-edge-light),
+              inset 0 -1px 0 var(--border-inner);               /* the "glass slab" lit edge */
+  --el-glow-live: 0 0 0 1px var(--live-glow), 0 0 18px var(--live-glow);
+
+  /* ── Typography ────────────────────────────────────────────────────── */
+  --font-sans: "Inter var", Inter, system-ui, -apple-system, sans-serif;
+  --font-mono: "JetBrains Mono", "SF Mono", ui-monospace, Menlo, monospace;
+  --fs-11:11px; --fs-12:12px; --fs-13:13px; --fs-14:14px; --fs-16:16px; --fs-18:18px; --fs-20:20px; --fs-26:26px;
+  --fw-regular:440; --fw-medium:520; --fw-semibold:620; --fw-bold:720;
+  --lh-tight:1.25; --lh-body:1.5;
+  --tracking-label:0.06em;   /* uppercase micro-labels / pill text */
+  --tracking-tight:-0.011em; /* headings */
+
+  /* ── Motion ────────────────────────────────────────────────────────── */
+  --ease-out:   cubic-bezier(0.16, 1, 0.3, 1);    /* snappy settle (entrances, focus, hover) */
+  --ease-inout: cubic-bezier(0.65, 0, 0.35, 1);   /* collapse / reflow */
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1); /* drop / snap overshoot */
+  --t-fast:120ms; --t-base:180ms; --t-entrance:220ms; --t-collapse:240ms;
+
+  font-family: var(--font-sans);
+  color-scheme: dark;
+}
+
+/* ── Legacy aliases so existing app class rules keep working during migration ── */
+:root {
+  --bg: var(--hud-bg-1);
+  --glass: var(--glass-base);
+  --panel: var(--glass-base);
+  --muted: var(--text-muted);
+}
+
+* { box-sizing: border-box; }
+html, body, #root { margin: 0; height: 100%; background: var(--hud-bg-1); color: var(--text); }
+body { font-family: var(--font-sans); -webkit-font-smoothing: antialiased; }
+
+/* ── Buttons (shared) ──────────────────────────────────────────────────── */
+button.btn, .hud-btn {
+  display: inline-flex; align-items: center; gap: var(--s-2);
+  background: transparent; color: var(--text);
+  border: 1px solid transparent; border-radius: var(--r-sm);
+  padding: 6px 10px; font: var(--fw-medium) var(--fs-13)/1 var(--font-sans);
+  cursor: pointer;
+  transition: background var(--t-fast) var(--ease-out),
+              border-color var(--t-fast) var(--ease-out),
+              transform var(--t-fast) var(--ease-out),
+              box-shadow var(--t-fast) var(--ease-out);
+}
+button.btn:hover, .hud-btn:hover { background: var(--glass-hover); border-color: var(--border-strong); transform: translateY(-1px); }
+button.btn:active, .hud-btn:active { transform: scale(0.96); }
+button.btn.active, .hud-btn.active {
+  background: var(--accent-soft); border-color: var(--border-strong); color: var(--accent-300);
+  box-shadow: inset 0 -2px 0 var(--accent);  /* active underline cue */
+}
+button.btn.primary { background: var(--accent); color: var(--text-on-accent); border-color: transparent; }
+button.btn.primary:hover { background: var(--accent-400); }
+button.btn.live.active, button.btn.rec.active {
+  background: var(--live); color: var(--text-on-accent); border-color: transparent;
+  box-shadow: var(--el-glow-live); animation: hud-breathe 2.4s var(--ease-inout) infinite alternate;
+}
+button.btn:disabled, .hud-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; }
+select.btn, input.btn { appearance: none; }
+button.btn:focus-visible, .hud-btn:focus-visible, select.btn:focus-visible {
+  outline: none; box-shadow: 0 0 0 2px var(--accent-glow);
+}
+
+/* ── Inputs (shared) ───────────────────────────────────────────────────── */
+textarea, input.text, input.topic, .hud-input {
+  width: 100%; background: var(--glass-input); color: var(--text);
+  border: 1px solid var(--border); border-radius: var(--r-sm);
+  padding: 8px 10px; font: var(--fw-regular) var(--fs-13)/var(--lh-body) var(--font-sans);
+  transition: border-color var(--t-fast) var(--ease-out), box-shadow var(--t-fast) var(--ease-out);
+}
+textarea:focus, input.text:focus, input.topic:focus, .hud-input:focus {
+  outline: none; border-color: var(--border-focus);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+textarea { resize: vertical; min-height: 120px; }
+select.btn { color: var(--text); }
+select.btn option { background: var(--hud-bg-2); color: var(--text); }
+
+/* ── Range sliders (shared: opacity popover, coding settings) ──────────── */
+input[type="range"].hud-range {
+  -webkit-appearance: none; appearance: none;
+  height: 4px; border-radius: var(--r-pill); background: var(--hud-bg-3);
+  outline: none; cursor: pointer;
+}
+input[type="range"].hud-range::-webkit-slider-thumb {
+  -webkit-appearance: none; appearance: none;
+  width: 14px; height: 14px; border-radius: 50%; border: none;
+  background: var(--accent); box-shadow: 0 0 0 4px var(--accent-soft);
+  transition: box-shadow var(--t-fast) var(--ease-out);
+}
+input[type="range"].hud-range:active::-webkit-slider-thumb { box-shadow: 0 0 0 6px var(--accent-soft); }
+input[type="range"].hud-range::-moz-range-thumb {
+  width: 14px; height: 14px; border: none; border-radius: 50%;
+  background: var(--accent); box-shadow: 0 0 0 4px var(--accent-soft);
+}
+
+/* ── Status pills (shared) ─────────────────────────────────────────────── */
+.pill {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 2px 9px; border-radius: var(--r-pill);
+  font: var(--fw-semibold) var(--fs-11)/1 var(--font-sans);
+  letter-spacing: var(--tracking-label); text-transform: uppercase;
+  background: var(--glass-input); color: var(--text-muted); border: 1px solid var(--border);
+  white-space: nowrap;
+}
+.pill::before { content:""; width:6px; height:6px; border-radius:50%; background: currentColor; flex: 0 0 auto; }
+.pill.live   { color: var(--live);  background: var(--good-soft); }
+.pill.good   { color: var(--good);  background: var(--good-soft); }
+.pill.warn   { color: var(--warn);  background: var(--warn-soft); }
+.pill.bad    { color: var(--bad);   background: var(--bad-soft); }
+.pill.neutral{ color: var(--text-muted); }
+.pill.live::before { box-shadow: var(--el-glow-live); animation: hud-breathe 2.4s var(--ease-inout) infinite alternate; }
+.pill.busy::before { animation: hud-pulse 1.2s var(--ease-inout) infinite; }
+
+/* ── Chips ─────────────────────────────────────────────────────────────── */
+.chip {
+  display: inline-block; padding: 2px 8px; margin: 2px; border-radius: var(--r-pill);
+  background: var(--glass-input); border: 1px solid var(--border);
+  font-size: var(--fs-12); color: var(--text-muted);
+}
+
+/* ── Chat message bubbles (shared by coding + meeting) ─────────────────── */
+.panel-chat { display: flex; flex-direction: column; gap: 10px; font-size: var(--fs-13); }
+.panel-chat .msg {
+  padding: 8px 11px; border-radius: var(--r-md);
+  background: var(--glass-msg); line-height: var(--lh-body);
+}
+.panel-chat .msg.user {
+  background: var(--accent-soft);
+  border-left: 2px solid var(--accent); border-top-left-radius: var(--r-xs);
+}
+.panel-chat .msg.streaming { border-left: 2px solid var(--accent); }
+.panel-chat .msg .who {
+  font: var(--fw-semibold) var(--fs-11)/1 var(--font-sans);
+  letter-spacing: var(--tracking-label); text-transform: uppercase;
+  color: var(--text-faint); margin-bottom: 4px;
+}
+.panel-chat code, .panel-chat pre {
+  font-family: var(--font-mono); background: var(--hud-bg-3);
+  border-radius: var(--r-xs); font-size: var(--fs-12);
+}
+.panel-chat pre { padding: 10px 12px; overflow: auto; border: 1px solid var(--border); }
+.panel-chat img.thumb { max-width: 100%; border-radius: var(--r-xs); margin-top: 6px; }
+.hint { color: var(--text-muted); font-size: var(--fs-12); }
+
+/* ── Mono numerics (timers / scores / KPIs / levels) ───────────────────── */
+.mono, .timer, .score { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+
+/* ── 7-segment audio LED meter (shared: coding + meeting) ──────────────── */
+.hud-meter { display: inline-flex; align-items: center; gap: 2px; height: 14px; }
+.hud-meter .seg {
+  width: 4px; height: 100%; border-radius: var(--r-xs);
+  background: var(--glass-input);
+  transition: background var(--t-fast) linear, box-shadow var(--t-fast) linear, opacity var(--t-fast) linear;
+}
+.hud-meter .seg.on            { background: var(--live); box-shadow: 0 0 5px var(--live-glow); }
+.hud-meter .seg.on.warn       { background: var(--warn); box-shadow: 0 0 5px var(--warn-soft); }
+.hud-meter .seg.on.peak       { background: var(--bad);  box-shadow: 0 0 5px var(--bad-soft); }
+.hud-meter .seg.hold          { opacity: 0.55; }
+.hud-meter.off .seg           { background: var(--glass-input); opacity: 0.5; box-shadow: none; }
+
+/* ── Custom scrollbar (shared in scrollable bodies) ────────────────────── */
+.scroll, .panel-chat, .hud-window-body { scrollbar-width: thin; scrollbar-color: var(--border-strong) transparent; }
+.scroll::-webkit-scrollbar, .hud-window-body::-webkit-scrollbar, .panel-chat::-webkit-scrollbar { width: 8px; height: 8px; }
+.scroll::-webkit-scrollbar-thumb, .hud-window-body::-webkit-scrollbar-thumb, .panel-chat::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: var(--r-pill); }
+.scroll::-webkit-scrollbar-track, .hud-window-body::-webkit-scrollbar-track { background: transparent; }
+
+/* ── Glow utilities ────────────────────────────────────────────────────── */
+.glow-accent { box-shadow: 0 0 0 1px var(--accent-soft), 0 0 18px -4px var(--accent-glow); }
+.glow-live   { box-shadow: var(--el-glow-live); }
+
+/* ── Region-select box (coding) ────────────────────────────────────────── */
+.region-box {
+  position: absolute; pointer-events: none;
+  border: 1.5px dashed var(--accent); background: var(--accent-wash);
+  border-radius: var(--r-xs);
+  background-image:
+    repeating-linear-gradient(90deg, var(--accent) 0 6px, transparent 6px 12px),
+    repeating-linear-gradient(0deg, var(--accent) 0 6px, transparent 6px 12px);
+  background-size: 12px 1.5px, 1.5px 12px;
+  background-position: 0 0, 0 0;
+  background-repeat: repeat-x, repeat-y;
+  animation: hud-march 0.6s linear infinite;
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   HudWindow — the shared floating panel chrome (move / resize / opacity /
+   focus-glow / collapse). Geometry + per-window opacity come in as inline
+   styles (left/top/width, --win-opacity); everything else is here.
+   ════════════════════════════════════════════════════════════════════════ */
+.hud-window {
+  position: fixed;
+  display: block;
+  color: var(--text);
+  font-family: var(--font-sans);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  background: color-mix(in srgb, var(--glass-thin) calc(var(--win-opacity, 1) * 100%), transparent);
+  backdrop-filter: blur(var(--blur-panel)) saturate(125%);
+  -webkit-backdrop-filter: blur(var(--blur-panel)) saturate(125%);
+  box-shadow: var(--el-2), var(--el-inset);
+  overflow: hidden;
+  transition: box-shadow var(--t-base) var(--ease-out), border-color var(--t-base) var(--ease-out);
+  animation: hud-window-in var(--t-entrance) var(--ease-out);
+}
+.hud-window::before {  /* top specular sheen */
+  content: ""; position: absolute; inset: 0 0 auto 0; height: 38%;
+  background: linear-gradient(180deg, rgba(255,255,255,0.06), transparent);
+  pointer-events: none; z-index: 0;
+}
+.hud-window[data-focused="true"] {
+  border-color: var(--border-strong);
+  box-shadow: var(--el-focus), var(--el-inset);
+}
+.hud-window.dragging, .hud-window.resizing {
+  transition: none;
+  box-shadow: var(--el-3), var(--el-inset);
+}
+
+/* Accent edge-light spine (focused) */
+.hud-spine {
+  position: absolute; left: 0; top: 0; bottom: 0; width: 3px; z-index: 4;
+  pointer-events: none; border-top-left-radius: var(--r-lg); border-bottom-left-radius: var(--r-lg);
+  background: linear-gradient(180deg, transparent, var(--accent) 18%, var(--accent) 82%, transparent);
+  box-shadow: 0 0 6px var(--accent-glow);
+  opacity: 0; transition: opacity var(--t-base) var(--ease-out);
+}
+.hud-window[data-focused="true"] .hud-spine { opacity: 0.7; }
+
+/* Title bar */
+.hud-window-titlebar {
+  position: relative; z-index: 2;
+  display: flex; align-items: center; gap: var(--s-2);
+  height: 44px; padding: 0 var(--s-2) 0 var(--s-3);
+  background: color-mix(in srgb, var(--glass-strong) calc(var(--win-opacity, 1) * 100%), transparent);
+  box-shadow: inset 0 -1px 0 var(--border);
+  border-top-left-radius: var(--r-lg); border-top-right-radius: var(--r-lg);
+  cursor: grab; user-select: none; touch-action: none;
+}
+.hud-window.dragging .hud-window-titlebar { cursor: grabbing; }
+.hud-window-titlebar:focus-visible { outline: none; box-shadow: inset 0 -1px 0 var(--border), 0 0 0 2px var(--accent-glow); }
+.hud-grip {
+  flex: 0 0 auto; width: 10px; height: 16px;
+  background-image: radial-gradient(currentColor 1px, transparent 1.5px);
+  background-size: 4px 4px; background-position: center;
+  color: var(--text-faint); transition: color var(--t-fast) var(--ease-out);
+}
+.hud-window-titlebar:hover .hud-grip { color: var(--accent-400); }
+.hud-icon {
+  flex: 0 0 auto; display: inline-flex; align-items: center; justify-content: center;
+  color: var(--accent-300); width: 16px; height: 16px;
+}
+.hud-window-title {
+  font: var(--fw-semibold) var(--fs-13)/1 var(--font-sans);
+  letter-spacing: var(--tracking-tight);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.hud-window-titlebar .spacer { flex: 1 1 auto; min-width: 6px; }
+.hud-titlebar-actions { flex: 0 0 auto; display: inline-flex; align-items: center; gap: 2px; }
+
+.hud-icon-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 26px; height: 26px; padding: 0;
+  border: 1px solid transparent; border-radius: var(--r-xs);
+  background: transparent; color: var(--text-muted); cursor: pointer;
+  font-size: 14px; line-height: 1;
+  transition: background var(--t-fast) var(--ease-out), color var(--t-fast) var(--ease-out), border-color var(--t-fast) var(--ease-out);
+}
+.hud-icon-btn:hover { background: var(--glass-hover); color: var(--text); border-color: var(--border-strong); }
+.hud-icon-btn.active { color: var(--accent-300); background: var(--accent-soft); }
+.hud-icon-btn:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--accent-glow); }
+.hud-icon-btn svg { width: 15px; height: 15px; }
+
+/* Opacity popover */
+.hud-opacity-pop {
+  position: absolute; z-index: 6; top: 42px; right: 8px;
+  display: flex; align-items: center; gap: var(--s-2);
+  padding: 8px 10px; border-radius: var(--r-md);
+  background: var(--glass-strong); border: 1px solid var(--border-strong);
+  box-shadow: var(--el-3);
+  backdrop-filter: blur(var(--blur-modal)); -webkit-backdrop-filter: blur(var(--blur-modal));
+  animation: hud-pop-in var(--t-base) var(--ease-out);
+}
+.hud-opacity-pop input[type="range"] { width: 120px; }
+.hud-opacity-pop .readout { font-size: var(--fs-11); color: var(--text-muted); min-width: 30px; text-align: right; }
+
+/* Body */
+.hud-window-body {
+  position: relative; z-index: 1;
+  overflow: auto; padding: var(--s-3);
+  opacity: var(--win-opacity, 1);
+  transition: opacity var(--t-base) var(--ease-out), height var(--t-collapse) var(--ease-inout);
+}
+.hud-window[data-focused="false"] .hud-window-body { opacity: calc(var(--win-opacity, 1) * 0.86); }
+.hud-window[data-collapsed="true"] .hud-window-body { padding-top: 0; padding-bottom: 0; }
+/* while a pointer gesture is live, body tracks the pointer 1:1 and never selects text */
+.hud-window.dragging .hud-window-body,
+.hud-window.resizing .hud-window-body { transition: opacity var(--t-base) var(--ease-out); pointer-events: none; user-select: none; }
+
+/* Resize handles */
+.hud-rh { position: absolute; z-index: 5; }
+.hud-rh-n  { top: -3px;  left: 10px; right: 10px; height: 8px; cursor: ns-resize; }
+.hud-rh-s  { bottom: -3px; left: 10px; right: 10px; height: 8px; cursor: ns-resize; }
+.hud-rh-e  { right: -3px; top: 10px; bottom: 10px; width: 8px; cursor: ew-resize; }
+.hud-rh-w  { left: -3px;  top: 10px; bottom: 10px; width: 8px; cursor: ew-resize; }
+.hud-rh-ne { top: -4px; right: -4px; width: 16px; height: 16px; cursor: nesw-resize; }
+.hud-rh-nw { top: -4px; left: -4px;  width: 16px; height: 16px; cursor: nwse-resize; }
+.hud-rh-se { bottom: -4px; right: -4px; width: 16px; height: 16px; cursor: nwse-resize; }
+.hud-rh-sw { bottom: -4px; left: -4px;  width: 16px; height: 16px; cursor: nesw-resize; }
+/* corner L-brackets, revealed on hover */
+.hud-rh-se::after, .hud-rh-sw::after, .hud-rh-ne::after, .hud-rh-nw::after {
+  content: ""; position: absolute; width: 9px; height: 9px;
+  border: 0 solid var(--border-strong); opacity: 0;
+  transition: opacity var(--t-fast) var(--ease-out), border-color var(--t-fast) var(--ease-out);
+}
+.hud-window:hover .hud-rh-se::after, .hud-window:hover .hud-rh-sw::after,
+.hud-window:hover .hud-rh-ne::after, .hud-window:hover .hud-rh-nw::after { opacity: 0.9; }
+.hud-rh-se::after { right: 3px; bottom: 3px; border-right-width: 1.5px; border-bottom-width: 1.5px; border-bottom-right-radius: 4px; }
+.hud-rh-sw::after { left: 3px;  bottom: 3px; border-left-width: 1.5px;  border-bottom-width: 1.5px; border-bottom-left-radius: 4px; }
+.hud-rh-ne::after { right: 3px; top: 3px;    border-right-width: 1.5px; border-top-width: 1.5px;    border-top-right-radius: 4px; }
+.hud-rh-nw::after { left: 3px;  top: 3px;     border-left-width: 1.5px;  border-top-width: 1.5px;    border-top-left-radius: 4px; }
+.hud-window.resizing .hud-rh::after { border-color: var(--accent) !important; opacity: 1 !important; }
+
+/* Snap guide line (drawn while dragging near a viewport edge) */
+.hud-snap-guide {
+  position: fixed; z-index: 1290; background: var(--accent);
+  box-shadow: 0 0 8px var(--accent-glow); pointer-events: none;
+  animation: hud-fade-in 0.1s var(--ease-out);
+}
+
+/* ── Keyframes ─────────────────────────────────────────────────────────── */
+@keyframes hud-breathe {
+  from { box-shadow: 0 0 0 1px var(--live-glow), 0 0 14px var(--live-glow); }
+  to   { box-shadow: 0 0 0 1px var(--live-glow), 0 0 26px var(--live-glow); }
+}
+@keyframes hud-pulse { 0%,100% { opacity: 0.5; } 50% { opacity: 1; } }
+@keyframes hud-march { to { background-position: 12px 0, 0 12px; } }
+@keyframes hud-window-in { from { opacity: 0; transform: translateY(6px) scale(0.985); } to { opacity: 1; transform: none; } }
+@keyframes hud-pop-in { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+@keyframes hud-fade-in { from { opacity: 0; } to { opacity: 1; } }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+}

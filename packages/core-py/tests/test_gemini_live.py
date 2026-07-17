@@ -1,5 +1,4 @@
 import asyncio
-import sys
 from unittest.mock import AsyncMock, MagicMock
 
 import pytest
@@ -19,8 +18,6 @@ def fake_genai():
     # We patch the local imports of google.genai inside gemini_live.py by injecting into sys.modules
     # But since it actually imports `from google import genai`, we might just mock `google.genai`
     # if it's already installed. It's safer to use MagicMock for the classes we need.
-    import google.genai as real_genai
-    from google.genai import types
 
     mock_client_instance = MagicMock()
     mock_aio = MagicMock()
@@ -100,12 +97,16 @@ async def test_receive_loop_routing(monkeypatch, fake_genai):
     async def fake_receive():
         # 1. Input transcription
         yield FakeResponse(FakeServerContent(it=FakeText("Hello user")))
-        # 2. Output transcription and Model turn (K3 issue: double emit)
+        # 2. Output transcription and Model turn carrying the SAME text (K3): native-audio turns
+        #    surface model text via both channels, so the bridge must de-dup to a single emit.
         yield FakeResponse(FakeServerContent(
             ot=FakeText("Hello back"),
             mt=FakeModelTurn([FakePart(text="Hello back")])
         ))
         # 3. Turn complete
+        yield FakeResponse(FakeServerContent(tc=True))
+        # 4. Next turn: the same string is fresh content again (de-dup is per-turn, not global).
+        yield FakeResponse(FakeServerContent(ot=FakeText("Hello back")))
         yield FakeResponse(FakeServerContent(tc=True))
 
     mock_session.receive = fake_receive
@@ -127,13 +128,13 @@ async def test_receive_loop_routing(monkeypatch, fake_genai):
     await asyncio.sleep(0.01)
     
     on_transcript.assert_called_once_with("Hello user")
-    
-    # K3 Issue: Double emit assertion
-    # The output transcription triggers on_text, and the model_turn ALSO triggers on_text
+
+    # K3 fixed: output_transcription + model_turn carrying identical text collapse to ONE emit
+    # within the turn; the same string in a later turn emits again (per-turn de-dup).
     assert on_text.call_count == 2
-    on_text.assert_any_call("Hello back")
-    
-    on_turn_complete.assert_called_once()
+    on_text.assert_called_with("Hello back")
+
+    assert on_turn_complete.call_count == 2
     
     await bridge.close()
 

@@ -67,10 +67,16 @@ def test_tracker_crud(client):
     assert res.status_code == 200
     assert len(res.json()) >= 1
 
-    # JOB-I-05: PUT Bogus status (K4 issue)
+    # JOB-I-05 (K4 fixed): a bogus status is rejected with 422, not persisted.
     res = client.put(f"/api/applications/{app_id}", json={"status": "Bogus", "notes": "note"})
+    assert res.status_code == 422
+    assert client.get(f"/api/applications/{app_id}").json()["status"] == "New"
+
+    # A known status still updates fine (and notes alongside it).
+    res = client.put(f"/api/applications/{app_id}", json={"status": "Applied", "notes": "sent"})
     assert res.status_code == 200
-    assert res.json()["status"] == "Bogus"
+    assert res.json()["status"] == "Applied"
+    assert res.json()["notes"] == "sent"
 
     res = client.delete(f"/api/applications/{app_id}")
     assert res.status_code == 200
@@ -91,10 +97,12 @@ def test_profile(client, monkeypatch):
     res = client.get("/api/profile")
     assert res.json()["text"] == "I am a dev."
 
-    # JOB-I-07: PDF upload & ValueError translation
+    # JOB-I-07 / K5: upload error translation.
     def fake_parse(data, filename):
+        if filename.endswith(".xyz"):
+            raise ValueError("Unsupported document type: .xyz")  # unsupported ext → ValueError
         if filename.endswith(".pdf") and b"corrupt" in data:
-            raise ValueError("Corrupt PDF")
+            raise RuntimeError("PdfReadError: EOF marker not found")  # pypdf-style failure
         return "parsed text"
 
     monkeypatch.setattr(main, "parse_document", fake_parse)
@@ -105,11 +113,25 @@ def test_profile(client, monkeypatch):
     assert res.status_code == 200
     assert client.get("/api/profile").json()["text"] == "parsed text"
 
-    # Corrupt PDF - K5 issue test
+    # Unsupported extension → 400 (ValueError path).
+    file_bytes = io.BytesIO(b"data")
+    res = client.post("/api/profile/upload", files={"file": ("resume.xyz", file_bytes, "application/octet-stream")})
+    assert res.status_code == 400
+
+    # K5 fixed: a corrupt PDF raises a non-ValueError (pypdf) → 400, not 500.
     file_bytes = io.BytesIO(b"corrupt data")
     res = client.post("/api/profile/upload", files={"file": ("resume.pdf", file_bytes, "application/pdf")})
     assert res.status_code == 400
-    assert res.json()["detail"] == "Corrupt PDF"
+    assert "could not parse" in res.json()["detail"]
+
+    # Empty file → 400.
+    res = client.post("/api/profile/upload", files={"file": ("resume.txt", io.BytesIO(b""), "text/plain")})
+    assert res.status_code == 400
+
+    # Oversized file → 413 (guard runs before parsing).
+    big = io.BytesIO(b"x" * (main.MAX_UPLOAD_BYTES + 1))
+    res = client.post("/api/profile/upload", files={"file": ("resume.txt", big, "text/plain")})
+    assert res.status_code == 413
 
 
 def test_ai_endpoints(client, mock_claude, monkeypatch):
