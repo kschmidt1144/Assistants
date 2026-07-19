@@ -1,6 +1,6 @@
 # Live_Assistant — Functionality Inventory
 
-> Source: `/Users/kevinschmidt/Repos/OldAssistants/Live_Assistant`
+> Source: `~/Repos/OldAssistants/Live_Assistant`
 > Stack: React 18 + Vite frontend, FastAPI backend, dual-model AI (Gemini Live API for realtime + Claude/Gemini for batch analysis). This is the most advanced of the assistants: speaker identification, voice profiles, live transcription, media recording, screen/camera/capture-card capture, cursor + display control, draggable overlay windows, interview prep with TTS.
 
 ---

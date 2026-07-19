@@ -5,7 +5,7 @@
 > deep one-shot analysis, OCR, region/scroll capture, draw-on-screen annotations — all
 > driven from a draggable glass overlay floating on top of the live video.
 
-Root: `/Users/kevinschmidt/Repos/OldAssistants/codeassistant`
+Root: `~/Repos/OldAssistants/codeassistant`
 
 ---
 

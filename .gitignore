@@ -39,3 +39,7 @@ data/
 
 # project-local npm cache (cache workaround)
 .npmcache/
+
+# Playwright MCP debug output + ad-hoc scripts (not part of the project)
+.playwright-mcp/
+test_post.py

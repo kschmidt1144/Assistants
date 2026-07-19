@@ -1,6 +1,6 @@
 # Meeting Assistant (Web_Meeting) — Functionality Inventory
 
-> Source root: `/Users/kevinschmidt/Repos/OldAssistants/Meeting_Assistant/Web_Meeting`
+> Source root: `~/Repos/OldAssistants/Meeting_Assistant/Web_Meeting`
 > Analyzed for a clean-room rebuild. This is an **early-stage prototype / vertical slice** — the plumbing (mic → WebSocket → Gemini Live → streamed text back) works end-to-end, but most "meeting assistant" features (transcript storage, summaries, multi-speaker, screen capture, AI audio out) are stubbed or absent.
 
 ---
@@ -9,7 +9,7 @@
 
 A cloud-native web app for **real-time microphone audio streaming to Google Gemini Live API**, with the model's streamed **text** responses rendered live in the browser. Branded in-UI as "Gemini Live." Marketed (README) as "real-time audio transcription and AI assistance," but in the current code the model is prompted as a generic `"You are a helpful assistant."` and simply talks back as text — there is no transcription pipeline, diarization, or meeting summarization implemented yet.
 
-Access is hard-locked to a single Google account (`kschmidt1144@gmail.com`).
+Access is hard-locked to a single Google account (`owner@example.com`).
 
 ---
 
@@ -62,7 +62,7 @@ File: `frontend/src/App.jsx` — the `onAudioData` callback does `websocketRef.c
 2. **Streamed text responses rendered as cards** — Incoming `text` frames are appended into a "response card." Streaming chunks are concatenated onto the last card while it's `isFinished: false`; logic to mark a card finished / start a new one on turn boundaries is a noted TODO (cards never actually flip `isFinished`, so all text accumulates into one card). `App.jsx::ws.onmessage`.
 3. **Google Sign-In auth** — Firebase `signInWithPopup(GoogleAuthProvider)`; `onAuthStateChanged` listener stores the user and fetches an ID token via `getIdToken()`. `App.jsx`, `firebase.js`.
 4. **Dev bypass ("Skip (Dev)")** — Sets a fake user and `token = 'dev-token'`; backend special-cases `"dev-token"` to skip auth entirely (`server.py` lines 54-56). Useful for local dev, a security hole in prod.
-5. **Single-user whitelist** — Backend rejects any authenticated user whose email is not in `ALLOWED_EMAILS = ["kschmidt1144@gmail.com"]` (closes WS with code 1008). `server.py`.
+5. **Single-user whitelist** — Backend rejects any authenticated user whose email is not in `ALLOWED_EMAILS = ["owner@example.com"]` (closes WS with code 1008). `server.py`.
 6. **Connection status indicator** — Header shows "Connected" (green) / "Disconnected" (red) driven by WS lifecycle callbacks. `App.jsx`.
 7. **Health endpoint** — `GET /health` → `{status:"ok"}` for Cloud Run probes. `server.py`.
 

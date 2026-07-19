@@ -1,6 +1,6 @@
 # Interview Assistant — Functionality Inventory
 
-> Clean-room rebuild reference. Source: `/Users/kevinschmidt/Repos/OldAssistants/interview_assistant`
+> Clean-room rebuild reference. Source: `~/Repos/OldAssistants/interview_assistant`
 > Stack: Vue 3 (Vite) frontend + FastAPI backend + Google Gemini Live API. A real-time interview copilot that transcribes both the interviewer and the candidate, detects questions, and streams STAR-format / quick-answer "hints" to the candidate during a live interview — plus an offline interview-prep mode (projects + behavioral Q&A generated from resume/JD). Ships with a Windows "stealth overlay" that is invisible to screen-share/capture.
 
 ---
