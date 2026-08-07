@@ -52,4 +52,21 @@ export const api = {
     req<{ cover_letter: string }>("/api/cover-letter", json("POST", body)),
   answerQuestion: (body: { application_id?: string; jd_text?: string; question: string }) =>
     req<{ answer: string }>("/api/answer-question", json("POST", body)),
+
+  interviewPacks: () => req<InterviewPackInfo[]>("/api/interview/packs"),
+  interviewPack: (name: string) =>
+    req<{ name: string; title: string; system: string }>(`/api/interview/packs/${name}`),
+  interviewDebrief: (body: { pack: string; transcript: TranscriptEntry[]; duration_seconds?: number }) =>
+    req<{ scorecard: string; saved: string }>("/api/interview/debrief", json("POST", body)),
 };
+
+export interface InterviewPackInfo {
+  name: string;
+  title: string;
+}
+
+export interface TranscriptEntry {
+  speaker: "interviewer" | "candidate";
+  text: string;
+  seconds?: number | null;
+}

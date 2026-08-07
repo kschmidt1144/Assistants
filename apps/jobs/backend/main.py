@@ -15,6 +15,7 @@ from typing import Any
 from assistants_core import ProviderRouter, get_settings, install_cors, parse_document, user_text
 from assistants_core.models import ModelRole
 from fastapi import FastAPI, File, HTTPException, UploadFile
+from interview import interview_router
 from prompts import COVER_SYSTEM, PARSE_SYSTEM, PARSED_JOB_SCHEMA, QA_SYSTEM
 from pydantic import BaseModel, field_validator
 from resume import tailor_and_score
@@ -36,6 +37,7 @@ async def lifespan(_app: FastAPI):
 
 app = FastAPI(title="Job Application Assistant", lifespan=lifespan)
 install_cors(app, ["http://localhost:5175"])  # scoped (not "*"); keeps CORS headers on 500s
+app.include_router(interview_router)
 
 
 def store() -> JobsStore:

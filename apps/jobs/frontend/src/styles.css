@@ -242,3 +242,60 @@ summary:hover { color: var(--text); }
   inherits: false;
   initial-value: 0;
 }
+
+/* ── Interview Practice ─────────────────────────────────────────────────── */
+.interview .error {
+  color: #ff6b6b;
+  background: rgba(255, 107, 107, 0.08);
+  border: 1px solid rgba(255, 107, 107, 0.35);
+  border-radius: var(--r-sm);
+  padding: 8px 12px;
+  margin-bottom: var(--s-2);
+  font: var(--fw-medium) var(--fs-12)/1.5 var(--font-sans);
+}
+.interview .live-bar { margin-bottom: var(--s-2); }
+.interview .meter {
+  width: 120px;
+  height: 8px;
+  border-radius: var(--r-pill);
+  background: var(--glass-strong);
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+.interview .meter-fill {
+  height: 100%;
+  background: var(--accent);
+  transition: width 80ms linear;
+}
+.interview .pill.timer.warn { color: #f4b942; border-color: #f4b942; }
+.interview .pill.timer.over { color: #ff6b6b; border-color: #ff6b6b; }
+.interview button.btn.danger { border-color: rgba(255, 107, 107, 0.5); color: #ff6b6b; }
+.interview .transcript {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+  margin-top: var(--s-3);
+  max-height: 52vh;
+  overflow: auto;
+  padding-right: 4px;
+}
+.interview .turn {
+  border-left: 2px solid var(--border-strong);
+  padding: 2px 0 2px 12px;
+}
+.interview .turn.interviewer { border-left-color: var(--accent); }
+.interview .turn .who {
+  font: var(--fw-semibold) var(--fs-11)/1.4 var(--font-sans);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-dim, var(--text));
+  opacity: 0.7;
+  margin-right: 8px;
+}
+.interview .turn .dur {
+  font: var(--fw-medium) var(--fs-11)/1.4 var(--font-sans);
+  opacity: 0.6;
+}
+.interview .turn .dur.over { color: #ff6b6b; opacity: 1; }
+.interview .turn p { margin: 2px 0 0; white-space: pre-wrap; }
+.interview .scorecard { margin-top: var(--s-3); }

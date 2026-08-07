@@ -111,6 +111,10 @@ class GeminiLiveBridge:
                     mt = getattr(sc, "model_turn", None)
                     if mt is not None and getattr(mt, "parts", None):
                         for part in mt.parts:
+                            # Thought-summary parts narrate the model's reasoning ("I've received
+                            # the signal…") — internal, never spoken; keep them out of on_text.
+                            if getattr(part, "thought", False):
+                                continue
                             await emit_text(getattr(part, "text", None))
                             inline = getattr(part, "inline_data", None)
                             if inline is not None and getattr(inline, "data", None):

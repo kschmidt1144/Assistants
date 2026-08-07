@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import { AddJob } from "./components/AddJob";
+import { InterviewPractice } from "./components/InterviewPractice";
 import { ProfilePanel } from "./components/ProfilePanel";
 import { Tracker } from "./components/Tracker";
 import { api } from "./lib/api";
 
-type View = "tracker" | "add" | "profile";
+type View = "tracker" | "add" | "profile" | "interview";
 
 const FALLBACK_STATUSES = ["New", "Interested", "Applied", "Interviewing", "Offer", "Rejected", "Withdrawn"];
 
@@ -24,6 +25,7 @@ export function App() {
         <button className={`btn ${view === "tracker" ? "active" : ""}`} onClick={() => setView("tracker")}>Tracker</button>
         <button className={`btn ${view === "add" ? "active" : ""}`} onClick={() => setView("add")}>Add Job</button>
         <button className={`btn ${view === "profile" ? "active" : ""}`} onClick={() => setView("profile")}>Profile</button>
+        <button className={`btn ${view === "interview" ? "active" : ""}`} onClick={() => setView("interview")}>Interview</button>
         <div className="spacer" />
         <span className="hint">no scraping · manual intake</span>
       </nav>
@@ -31,6 +33,7 @@ export function App() {
         {view === "profile" && <ProfilePanel />}
         {view === "add" && <AddJob onTracked={() => { setTrackerKey((k) => k + 1); setView("tracker"); }} />}
         {view === "tracker" && <Tracker key={trackerKey} statuses={statuses} />}
+        {view === "interview" && <InterviewPractice />}
       </div>
     </div>
   );
