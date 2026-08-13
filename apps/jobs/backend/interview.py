@@ -28,6 +28,10 @@ PACKS_DIR = Path(
     os.environ.get("INTERVIEW_PACKS_DIR", "~/Repos/jobsearch/interview-prep/mock")
 ).expanduser()
 GRADING_MARKER = "## GRADING FACTS"
+# Gemini native-audio prebuilt voice for the interviewer. Overridable per pack with a
+# "Voice: <Name>" line; Charon is the deep male default — deliberately not a friendly voice.
+DEFAULT_VOICE = "Charon"
+VOICE_RE = re.compile(r"^Voice:\s*(\w+)\s*$", re.MULTILINE)
 
 INTERVIEWER_PREAMBLE = """\
 You are conducting a MOCK job interview by voice, playing the interviewer described below. Rules:
@@ -101,7 +105,13 @@ def list_packs() -> list[dict[str, str]]:
 @interview_router.get("/api/interview/packs/{name}")
 def get_pack(name: str) -> dict[str, str]:
     title, interviewer_half, _ = _load_pack(name)
-    return {"name": name, "title": title, "system": f"{INTERVIEWER_PREAMBLE}\n{interviewer_half}"}
+    m = VOICE_RE.search(interviewer_half)
+    return {
+        "name": name,
+        "title": title,
+        "system": f"{INTERVIEWER_PREAMBLE}\n{interviewer_half}",
+        "voice": m.group(1) if m else DEFAULT_VOICE,
+    }
 
 
 # ── the live session ──────────────────────────────────────────────────────────

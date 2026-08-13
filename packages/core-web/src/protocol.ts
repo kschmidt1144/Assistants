@@ -6,7 +6,7 @@
 
 /** Browser → backend. */
 export type ClientMessage =
-  | { type: "config"; system?: string; model?: string }
+  | { type: "config"; system?: string; model?: string; voice?: string }
   | { type: "audio"; data: string } // base64 PCM16 @ 16kHz mono
   | { type: "image"; data: string } // base64 JPEG frame
   | { type: "text"; data: string }

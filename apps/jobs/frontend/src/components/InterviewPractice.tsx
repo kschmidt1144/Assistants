@@ -135,7 +135,7 @@ export function InterviewPractice() {
       );
       rtRef.current = rt;
       rt.connect();
-      rt.sendConfig(pack.system);
+      rt.sendConfig(pack.system, undefined, pack.voice);
       rt.sendText("[BEGIN_INTERVIEW]");
 
       micOnRef.current = true;

@@ -120,8 +120,8 @@ export class RealtimeClient {
     }
   }
 
-  sendConfig(system?: string, model?: string): void {
-    this.send({ type: "config", system, model });
+  sendConfig(system?: string, model?: string, voice?: string): void {
+    this.send({ type: "config", system, model, voice });
   }
   sendAudio(base64: string): void {
     this.send({ type: "audio", data: base64 });

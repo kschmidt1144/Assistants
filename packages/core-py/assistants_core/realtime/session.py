@@ -23,11 +23,12 @@ class RealtimeSession:
         self._base_system = base_system
         self._started = False
 
-    async def _connect(self, system: str | None) -> None:
+    async def _connect(self, system: str | None, voice: str | None = None) -> None:
         await self._bridge.connect(
             system_instruction=system or self._base_system or None,
             response_modalities=("AUDIO",),  # native-audio (#8); model text arrives via transcription
             enable_transcription=True,
+            voice=voice,
             on_text=lambda text: self._send({"type": "text", "data": text}),
             on_transcript=lambda text: self._send({"type": "transcript", "text": text}),
             on_audio=lambda audio: self._send(
@@ -45,7 +46,7 @@ class RealtimeSession:
 
         if mtype == "config":
             if not self._started:
-                await self._connect(msg.get("system"))
+                await self._connect(msg.get("system"), msg.get("voice"))
             return
 
         if not self._started:

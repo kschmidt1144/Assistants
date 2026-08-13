@@ -55,7 +55,7 @@ export const api = {
 
   interviewPacks: () => req<InterviewPackInfo[]>("/api/interview/packs"),
   interviewPack: (name: string) =>
-    req<{ name: string; title: string; system: string }>(`/api/interview/packs/${name}`),
+    req<{ name: string; title: string; system: string; voice?: string }>(`/api/interview/packs/${name}`),
   interviewDebrief: (body: { pack: string; transcript: TranscriptEntry[]; duration_seconds?: number }) =>
     req<{ scorecard: string; saved: string }>("/api/interview/debrief", json("POST", body)),
 };

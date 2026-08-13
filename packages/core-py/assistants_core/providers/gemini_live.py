@@ -43,6 +43,7 @@ class GeminiLiveBridge:
         system_instruction: str | None = None,
         response_modalities: tuple[str, ...] = ("AUDIO",),
         enable_transcription: bool = True,
+        voice: str | None = None,
         on_text: Cb = None,
         on_audio: Cb = None,
         on_transcript: Cb = None,
@@ -65,6 +66,12 @@ class GeminiLiveBridge:
             "response_modalities": list(response_modalities),
             "system_instruction": system_instruction,
         }
+        if voice:
+            config_kwargs["speech_config"] = types.SpeechConfig(
+                voice_config=types.VoiceConfig(
+                    prebuilt_voice_config=types.PrebuiltVoiceConfig(voice_name=voice)
+                )
+            )
         if enable_transcription:
             # Native-audio models reply with AUDIO and surface text via transcription, so we
             # enable input (user speech) and, for audio replies, output (model speech) transcription.
