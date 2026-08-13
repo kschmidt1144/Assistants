@@ -25,7 +25,7 @@ interview_router = APIRouter()
 _provider = ProviderRouter()
 
 PACKS_DIR = Path(
-    os.environ.get("INTERVIEW_PACKS_DIR", "~/Repos/jobsearch/interview-prep/mock")
+    os.environ.get("INTERVIEW_PACKS_DIR", "~/Repos/VoiceCoach/data/packs")
 ).expanduser()
 GRADING_MARKER = "## GRADING FACTS"
 # Gemini native-audio prebuilt voice for the interviewer. Overridable per pack with a
